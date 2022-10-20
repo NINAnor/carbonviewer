@@ -1,0 +1,33 @@
+{
+  "cultural_date_format": "%d-%m-%Y",
+  "languages": ["no", "en"],
+  "translation": [
+      {"no": "Volumberegning","en": "Volume calculation"},
+      {"no": "Last opp en zip-fil", "en": "Upload a zip file"},
+      {"no": "Last inn datasett", "en": "Load dataset"},
+	    {"no": "Skift språk", "en": "Change language"},
+	    {"no": "Resultater", "en": "Results"},
+	    {"no": "Om oss", "en": "ABOUT"},
+	    {"no": "Last ned resultater", "en": "Download results"},
+	    {"no": "Areal", "en": "Area"},
+	    {"no": "Volum", "en": "Volume"},
+	    {"no": "Beregn volum", "en": "Calculate volume"},
+	    {"no": "Torvegenskaper", "en": "Peat properties"},
+	    {"no": "Standardverdier", "en": "Default values"},
+	    {"no": "Egendefinerte verdier", "en": "Custom values"},
+	    {"no": "Massetetthet", "en": "Bulk density"},
+	    {"no": "Organisk materiale", "en": "Organic matter"},
+	    {"no": "Karboninnhold", "en": "Carbon content"},
+	    {"no": "App laget med", "en": "App made with"},
+	    {"no": "av IPN-GRAN-teamet.", "en": "by the IPN-GRAN team."},
+	    {"no": "Nedbørsmyr", "en": "Bog"},
+	    {"no": "Jordvannsmyr", "en": "Fen"},
+	    {"no": "Hovedmyrtype", "en": "General peatland type"},
+	    {"no": "Myrtype", "en": "Specific peatland type"},
+	    {"no": "Kart over området", "en": "Map of the area"},
+	    {"no": "Kart med interpolerte torvdybder", "en": "Map of interpolated peat depths"},
+	    {"no": "Dybde", "en": "Depth"},
+	    {"no": "Bruksanvisning", "en": "Instructions"},
+      {"no": "Last verdier", "en": "Load values"}
+    ]
+}

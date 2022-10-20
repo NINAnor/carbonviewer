@@ -1,0 +1,19 @@
+variables:
+  CONTAINER_IMAGE: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG
+
+before_script:
+  - mkdir -p /kaniko/.docker
+  - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > /kaniko/.docker/config.json
+
+# https://docs.gitlab.com/ee/ci/docker/using_kaniko.html#building-a-docker-image-with-kaniko
+docker:
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  stage: build
+  variables:
+    CONTEXT: .
+  script:
+    - /kaniko/executor --context $CONTEXT --dockerfile Dockerfile --destination $CONTAINER_IMAGE:$CI_COMMIT_SHA --destination $CONTAINER_IMAGE:latest
+
+
