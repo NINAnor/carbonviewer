@@ -1,4 +1,10 @@
-# CarbonViewer
+<h1 align="center">CarbonViewer:four_leaf_clover: </h1>
+<h2 align="center">A calculator for peatland volume and carbon stock to support area planners and decision makers .</h2>
+
+![CC BY-NC-SA 4.0][license-badge]
+[![DOI](https://zenodo.org/badge/554694482.svg)](https://zenodo.org/badge/latestdoi/554694482)
+
+[license-badge]: https://badgen.net/badge/License/CC-BY-NC-SA%204.0/green
 
 **NOTE**: The application supports both the English and Norwegian language. To change the language, click on the `Change language` box and choose `en` for English or `no` for Norwegian. 
 

@@ -85,7 +85,7 @@ server <- function(input, output, session){
   df_reactive$gran_data <- reactive({
     req(input$s_peatland_type)
     
-    df_read <- fread("/home/rstudio/app/for_calculator_20221010.csv",
+    df_read <- fread("/home/rstudio/app/dataset.csv",
                      sep = ";",
                      encoding = "unknown")
     

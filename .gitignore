@@ -4,3 +4,4 @@
 .Ruserdata
 data_exple/
 docker_run_rstudio.sh
+rstudio-prefs.json
