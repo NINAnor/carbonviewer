@@ -103,7 +103,7 @@ customTheme <- dashboardthemes::shinyDashboardThemeDIY(
   ,tabBoxBorderRadius = 5
   
   ### inputs
-  ,buttonBackColor = "rgb(235,235,235)"
+  ,buttonBackColor = "#7CD1B8"
   ,buttonTextColor = "rgb(0,0,0)"
   ,buttonBorderColor = "rgb(200,200,200)"
   ,buttonBorderRadius = 5
