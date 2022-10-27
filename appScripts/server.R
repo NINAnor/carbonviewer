@@ -33,6 +33,7 @@ server <- function(input, output, session){
   
   ##### IN CONSTRUCTION ####
   observeEvent(input$unzip, {
+    tryCatch({
     unzip (input$upload_zip$datapath, exdir = file.path(BASE))
     
     shp_file <- list.files(BASE, pattern = '.shp', recursive = TRUE)
@@ -49,12 +50,44 @@ server <- function(input, output, session){
 
     df_reactive$shape <- shp
     df_reactive$points <- dfs
+    }, 
+    error = function(e) {
+      message(e$message)
+      showModal(modalDialog(
+        title = "input_error",
+        "Please upload a dataset before clicking on 'load dataset'. 
+        The dataset should be a zip file containing both a shapefile with the extent of the area 
+        of interest and a csv file containing peat depth measures (in m) taken at the site with coordinates 
+        for each measure (given in UTM 32 N, EPSG:25832)",
+        easyClose = TRUE
+      ))
+      return(0)
+    }
+    )
+    
   })
   
   observeEvent(input$run_upload, {
+    
+    tryCatch({
+    
     interp <- interpolation(BASE)
     df_reactive$results_volume <- interp[[1]]
     df_reactive$interpolation_raster <- interp[[2]]
+    }, 
+    error = function(e) {
+      message(e$message)
+      showModal(modalDialog(
+        title = "input_error",
+        "Please make sure the uploaded dataset respect the required format. 
+        The dataset should be a zip file containing both a shapefile with the extent of the area 
+        of interest and a csv file containing peat depth measures (in m) taken at the site with coordinates 
+        for each measure (given in UTM 32 N, EPSG:25832)",
+        easyClose = TRUE
+      ))
+      return(0)
+    }
+    )
   })
   
   ############################

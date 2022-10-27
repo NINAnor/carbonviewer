@@ -106,10 +106,6 @@ The application has been created by [Benjamin Cretois](https://www.nina.no/engli
 <img src="man/figures/statnett.png" alt="drawing" width="100"/>
 
 
-### Copyright / Opphavsrett
-
-[![License](https://img.shields.io/badge/Licence-GPL%20v2.0-orange.svg)]() CarbonViewer is licensed under the GNU General Public License (GPL) v2.0. 
-
 ### How to cite us:
 
 
