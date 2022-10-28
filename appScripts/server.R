@@ -54,7 +54,7 @@ server <- function(input, output, session){
     error = function(e) {
       message(e$message)
       showModal(modalDialog(
-        title = "input_error",
+        title = "Input error",
         "Please upload a dataset before clicking on 'load dataset'. 
         The dataset should be a zip file containing both a shapefile with the extent of the area 
         of interest and a csv file containing peat depth measures (in m) taken at the site with coordinates 
@@ -78,7 +78,7 @@ server <- function(input, output, session){
     error = function(e) {
       message(e$message)
       showModal(modalDialog(
-        title = "input_error",
+        title = "Interpolation error",
         "Please make sure the uploaded dataset respect the required format. 
         The dataset should be a zip file containing both a shapefile with the extent of the area 
         of interest and a csv file containing peat depth measures (in m) taken at the site with coordinates 
@@ -352,9 +352,7 @@ server <- function(input, output, session){
   # Downloadable csv of selected dataset ----
   output$downloadData <- downloadHandler(
     
-    filename = function() {
-      paste("results-", Sys.Date(), ".zip", sep="")
-    },
+    filename = function() {paste("results-", Sys.Date(), ".zip", sep="")},
     
     content = function(file) {
       

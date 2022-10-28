@@ -1,4 +1,10 @@
-# CarbonViewer
+<h1 align="center">CarbonViewer</h1>
+<h2 align="center">A calculator for peatland volume and carbon stock to support area planners and decision makers .</h2>
+
+![CC BY-NC-SA 4.0][license-badge]
+[![DOI](https://zenodo.org/badge/554694482.svg)](https://zenodo.org/badge/latestdoi/554694482)
+
+[license-badge]: https://badgen.net/badge/License/CC-BY-NC-SA%204.0/green
 
 **NOTE**: The application supports both the English and Norwegian language. To change the language, click on the `Change language` box and choose `en` for English or `no` for Norwegian. 
 
@@ -34,7 +40,7 @@ Det siste trinnet beregner den totale karbonmengden i det aktuelle området. Bru
 
 - 1) `Standardverdier`: Når dette alternativet er valgt, trenger brukeren kun å velge myrtype for området. Her vil brukeren få flere alternative detaljnivåer for myrtype, gitt den kunnskapen som brukeren innehar om det angitte området. Beregningen av karbonmengden baseres på eksisterende data for **massetetthet**, og **andel organisk materiale** for oppgitt myrtype, samt standardverdi på 0.5 for **andel karboninnhold i organisk materiale** (se artikkel for kilder).
 
-- 2) `Egendefinerte verdier`: Dette alternativet forutsetter at brukeren kjenner verdiene for **massetetthet** (i g/cm3 eller tonn/m3, vanligvis mindre enn 1 og ofte så lite som 0.1 for myr), **andel organisk materiale** (verdi 0-1) og **andel karboninnhold i organisk materiale** (verdi 0-1) i det aktuelle området eller ønsker å teste datasettet med egne inngangsverdier. Her er det mulig å legge inn egne tall. Når tallene er lagt inn, kan brukeren klikke på "Last inn verdier".
+- 2) `Egendefinerte verdier`: Dette alternativet forutsetter at brukeren kjenner verdiene for **massetetthet** (i g/cm3 eller tonn/m3, vanligvis mindre enn 0.2 for myr), **andel organisk materiale** (verdi 0-1) og **andel karboninnhold i organisk materiale** (verdi 0-1) i det aktuelle området eller ønsker å teste datasettet med egne inngangsverdier. Her er det mulig å legge inn egne tall. Når tallene er lagt inn, kan brukeren klikke på "Last inn verdier".
 
 Den totale karbonmengden (kg) i området vises øverst til høyre i applikasjonen.
 
@@ -75,7 +81,7 @@ The final step lies in calculating the carbon content of the given area. When cl
 
 - 1) `Default values`: Using this option, the user choose the peatland type of the area. The calculation of the carbon content will then be done using a database of peat properties from Norwegian mires, that contain values for **bulk density** and **fraction organic matter** representing the chosen peatland type, and a set value of 0.5 for **fraction of carbon content in organic matter** (see paper for references).
 
-- 2) `Custom values`: This option requires that the user knows the values of **bulk density** (in g/cm3 or tonne/m3, commonly less than 1 and often as small as 0.1 for peatlands), **fraction organic matter** (values of 0-1) and **fraction carbon content** (values of 0-1) in the given area, or that the user is interested in testing with specific values. The input values are specified in the three boxes. Once the values are inserted, the user can click on `Load values`.
+- 2) `Custom values`: This option requires that the user knows the values of **bulk density** (in g/cm3 or tonne/m3, commonly less than 0.2 for peatlands), **fraction organic matter** (values of 0-1) and **fraction carbon content** (values of 0-1) in the given area, or that the user is interested in testing with specific values. The input values are specified in the three boxes. Once the values are inserted, the user can click on `Load values`.
 
 The total carbon content (kg) of the area will be displayed on the top right panel of this application.
 
@@ -99,10 +105,6 @@ The application has been created by [Benjamin Cretois](https://www.nina.no/engli
 <img src="man/figures/ntnu.png" alt="drawing" width="100"/>
 <img src="man/figures/statnett.png" alt="drawing" width="100"/>
 
-
-### Copyright / Opphavsrett
-
-[![License](https://img.shields.io/badge/Licence-GPL%20v2.0-orange.svg)]() CarbonViewer is licensed under the GNU General Public License (GPL) v2.0. 
 
 ### How to cite us:
 

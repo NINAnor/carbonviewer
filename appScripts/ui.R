@@ -33,9 +33,9 @@ sidebar <- shinydashboard::dashboardSidebar(
                 actionButton(inputId = "run_upload", label = i18n$t("Beregn volum"))
              ),
     
-    menuItem(i18n$t("Torvegenskaper"), tabName = "carbonchar", icon = icon('download'),
+    menuItem(i18n$t("Torvegenskaper"), tabName = "carbonchar", icon = icon('keyboard'),
              
-      menuItem(i18n$t("Standardverdier"), tabName = "df_values", icon = icon('download'),
+      menuItem(i18n$t("Standardverdier"), tabName = "df_values", icon = icon('text'),
              selectInput(inputId = "g_peatland_type", 
                          label = i18n$t(shiny::HTML("Hovedmyrtype")),
                          choices = c("Unknown / Ukjent" = "unknown",
@@ -46,7 +46,7 @@ sidebar <- shinydashboard::dashboardSidebar(
       ),
              
              
-      menuItem(i18n$t("Egendefinerte verdier"), tabName = "custom_values", icon = icon('download'),
+      menuItem(i18n$t("Egendefinerte verdier"), tabName = "custom_values", icon = icon('00'),
              numericInput(inputId = "bulkdensity",
                        label = i18n$t(shiny::HTML("Massetetthet")),
                        value = 0.1,
@@ -68,12 +68,12 @@ sidebar <- shinydashboard::dashboardSidebar(
     ),
     
     
-    menuItem(i18n$t("Bruksanvisning"), tabName = "instruction", icon = icon("th")),
+    menuItem(i18n$t("Bruksanvisning"), tabName = "instruction", icon = icon("comment")),
     
     menuItem(i18n$t("Resultater"), tabName = "tables", icon = icon("th")
              ),
     
-    menuItem(i18n$t("Last ned resultater"), tabName = "download", icon = icon("th"),
+    menuItem(i18n$t("Last ned resultater"), tabName = "download", icon = icon("file-export"),
       downloadButton("downloadData", shiny::HTML("Download"))
     )
   ),
