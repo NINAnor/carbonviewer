@@ -6,7 +6,7 @@ header <- shinydashboard::dashboardHeader(title = "CarbonViewer",
                             a(
                               strong(i18n$t("ABOUT")),
                               height = 40,
-                              href = "https://gitlab.com/nina-data/carbonviewer",
+                              href = "https://github.com/NINAnor/carbonviewer",
                               title = "",
                               target = "_blank"
                             ),
