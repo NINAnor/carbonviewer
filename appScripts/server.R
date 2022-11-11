@@ -315,7 +315,7 @@ server <- function(input, output, session){
   shot_interp_map <- reactive({
     
     mapshot( x = interp_map()
-             , file = paste0(BASE, "/map_interpolation.png")
+             , file = "map_interpolation.png"
              , cliprect = "viewport" # the clipping rectangle matches the height & width from the viewing port
              , selfcontained = FALSE) # when this was not specified, the function for produced a PDF of two pages: one of the leaflet map, the other a blank page.
   })
@@ -324,7 +324,7 @@ server <- function(input, output, session){
   shot_d_map <- reactive({
     
     mapshot( x = d_map()
-             , file = paste0(BASE, "/map_descriptive.png")
+             , file = "map_descriptive.png"
              , cliprect = "viewport"
              , selfcontained = FALSE) 
     
@@ -333,9 +333,7 @@ server <- function(input, output, session){
   
   # Write the raster
   write_raster <- reactive({
-    
-    writeRaster(df_reactive$interpolation_raster, paste0(BASE, "/interpolation_raster"), format = "GTiff")
-    
+    writeRaster(df_reactive$interpolation_raster, "interpolation_raster", format = "GTiff")
   })
   
   result_csv <- reactive({
@@ -345,7 +343,7 @@ server <- function(input, output, session){
     c_stock <- tibble(Description = "carbon_stock", Results = df_reactive$c_stock, units = "Kg")
     results <- rbind(results, area, c_stock)
 
-    write.csv(results, paste0(BASE, file  = "/results.csv"))
+    write.csv(results, "results.csv")
     
   })
     
@@ -357,8 +355,6 @@ server <- function(input, output, session){
     content = function(file) {
       
       setwd(BASE)
-      print(BASE)
-      
       shot_interp_map()
       write_raster()
       shot_d_map()
