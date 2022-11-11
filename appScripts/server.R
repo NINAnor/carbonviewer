@@ -25,7 +25,7 @@ server <- function(input, output, session){
   #######################
   # PREPARE THE DATASET #
   #######################
-  BASE=paste0(getwd(), "/", session$token)
+  BASE=paste0("/home/rstudio/app", "/", session$token)
   dir.create(BASE)
   
   df_reactive <- reactiveValues()
