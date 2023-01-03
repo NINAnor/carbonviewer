@@ -3,9 +3,8 @@ library(data.table)
 
 devtools::install_github("Appsilon/shiny.i18n")
 
-webshot::install_phantomjs()
 
-df_read <- fread("/home/rstudio/app/for_calculator_20221010.csv",
+df_read <- fread("/home/rstudio/app/dataset.csv",
                  sep = ";",
                  encoding = "unknown")
 
@@ -47,6 +46,18 @@ dfs <- st_as_sf(x = df,
 sf_shp <- shp %>% st_as_sf()
 dfsp <- as(dfs, Class="Spatial")
 
+
+tm_shape(shp) + 
+  tm_polygons() +
+tm_shape(dfs) +
+  tm_dots() +
+tm_layout(title= 'Map of the sampled area')
+
+  
+
+plot(shp)
+plot(dfs)
+
 #################
 # Interpolation #
 #################
@@ -62,26 +73,22 @@ neigh = c((1), seq(from=2,to=30,by = 2), c(length=(neighbors)))
 
 temp <- data.frame()
 
-withProgress(message = "Computing the interpolation", {
-  for (i in power) {
-    for (j in neigh) {
-      
-      temp2 <- NULL
-      temp3 <- NULL
-      temp4 <- NULL
-      
-      run = paste(i, j, sep="_")
-      
-      temp2 <- idw(Dybde ~ 1, dfsp, grid_crop, nmax=j, idp=i)
-      temp3 <- as.data.frame(temp2@data)
-      temp4 <- sum(temp3$var1.pred)
-      temp5 <- cbind(run, temp4)
-      temp  <- rbind(temp, temp5)
-    }
-    Sys.sleep(0.5)
-    incProgress(1 / length(power))
-  } 
-})
+for (i in power) {
+  for (j in neigh) {
+    
+    temp2 <- NULL
+    temp3 <- NULL
+    temp4 <- NULL
+    
+    run = paste(i, j, sep="_")
+    
+    temp2 <- idw(Dybde ~ 1, dfsp, grid_crop, nmax=j, idp=i)
+    temp3 <- as.data.frame(temp2@data)
+    temp4 <- sum(temp3$var1.pred)
+    temp5 <- cbind(run, temp4)
+    temp  <- rbind(temp, temp5)
+  }
+} 
 
 volume <- temp
 volume <-dplyr::rename(volume, volume=temp4)
@@ -106,11 +113,9 @@ results_volume <- data.frame(Description, Results = c(mean, min, max, sd, s))
 interpolation <- idw(Dybde ~ 1, dfsp, grid_crop, nmax=30, idp=3)
 interpolation <- raster(interpolation)
 
-
-
-
-volume
-
-
+tm_shape(interpolation) +
+  tm_raster(title = "Depth") +
+  tm_layout(title= 'Map of the interpolated area',
+            legend.position = c("left", "top"))
 
 

@@ -18,6 +18,7 @@ library(gstat)
 library(data.table)
 library(mapview)
 library(shiny.i18n)
+library(tmap)
 
 # Translation file
 i18n <- Translator$new(translation_json_path = "/home/rstudio/app/translation.json")

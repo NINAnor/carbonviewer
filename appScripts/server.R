@@ -314,23 +314,23 @@ server <- function(input, output, session){
   
   # Write the interpolation map
   shot_interp_map <- reactive({
-    
-    mapshot( x = interp_map()
-             , file = "map_interpolation.png"
-             , cliprect = "viewport" # the clipping rectangle matches the height & width from the viewing port
-             , selfcontained = FALSE) # when this was not specified, the function for produced a PDF of two pages: one of the leaflet map, the other a blank page.
+    interp_map <- tm_shape(df_reactive$interpolation_raster) +
+      tm_raster(title = i18n$t("Dybde")) +
+      tm_layout(title= i18n$t("Kart med interpolerte torvdybder"),
+                legend.position = c("left", "top"))
+    tmap_save(interp_map, "map_interpolation.png")
   })
   
   # Write the descriptive map
   shot_d_map <- reactive({
+    d_map <- tm_shape(df_reactive$shape) + 
+      tm_polygons() +
+      tm_shape(df_reactive$points) +
+      tm_dots() +
+      tm_layout(title= i18n$t("Kart over området"))
+    tmap_save(d_map, "map_descriptive.png")
     
-    mapshot( x = d_map()
-             , file = "map_descriptive.png"
-             , cliprect = "viewport"
-             , selfcontained = FALSE) 
-    
-    
-  })
+    })
   
   # Write the raster
   write_raster <- reactive({
