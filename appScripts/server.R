@@ -17,9 +17,10 @@ server <- function(input, output, session){
   # file with translations
   observeEvent(input$selected_language, {
     # This print is just for demonstration
+    print(input$selected_language)
     print(paste("Language change!", input$selected_language))
     # Here is where we update language in session
-    shiny.i18n::update_lang(session, input$selected_language)
+    shiny.i18n::update_lang(input$selected_language, session)
   })
   
   #######################

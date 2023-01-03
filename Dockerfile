@@ -18,16 +18,12 @@ RUN install2.r --error \
     
 RUN R -e "devtools::install_github('hadley/emo')"
 RUN R -e "devtools::install_github('Appsilon/shiny.i18n')"
-
-# NOT SURE HERE!!!!
-#RUN R -e "webshot::install_phantomjs()"
     
 COPY . ./home/rstudio/app/
 
 # Change the user settings
 RUN mkdir -p ./home/rstudio/.config/rstudio/
 RUN cp ./home/rstudio/app/rstudio-prefs.json ./home/rstudio/.config/rstudio/
-
 
 CMD Rscript ./home/rstudio/app/app.R
 

@@ -17,7 +17,6 @@ header <- shinydashboard::dashboardHeader(title = "CarbonViewer",
 # SIDEBAR -----------------------------------------------------------------------------------------
 sidebar <- shinydashboard::dashboardSidebar(
   sidebarMenu(
-
     shiny.i18n::usei18n(i18n),
       selectInput('selected_language',
                     i18n$t("Skift språk"),
@@ -35,7 +34,7 @@ sidebar <- shinydashboard::dashboardSidebar(
     
     menuItem(i18n$t("Torvegenskaper"), tabName = "carbonchar", icon = icon('keyboard'),
              
-      menuItem(i18n$t("Standardverdier"), tabName = "df_values", icon = icon('text'),
+      menuItem(i18n$t("Standardverdier"), tabName = "df_values", icon = icon('keyboard'),
              selectInput(inputId = "g_peatland_type", 
                          label = i18n$t(shiny::HTML("Hovedmyrtype")),
                          choices = c("Unknown / Ukjent" = "unknown",
@@ -46,7 +45,7 @@ sidebar <- shinydashboard::dashboardSidebar(
       ),
              
              
-      menuItem(i18n$t("Egendefinerte verdier"), tabName = "custom_values", icon = icon('00'),
+      menuItem(i18n$t("Egendefinerte verdier"), tabName = "custom_values", icon = icon('keyboard'),
              numericInput(inputId = "bulkdensity",
                        label = i18n$t(shiny::HTML("Massetetthet")),
                        value = 0.1,
