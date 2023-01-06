@@ -24,6 +24,8 @@ sidebar <- shinydashboard::dashboardSidebar(
                     selected = i18n$get_key_translation(),
                     ),
     
+    menuItem(i18n$t("Bruksanvisning"), tabName = "instruction", icon = icon("comment")),
+    
     menuItem(i18n$t("Volumberegning"), tabName = "upload", icon = icon('download'),
                 fileInput(inputId = "upload_zip",
                            label = i18n$t(shiny::HTML("Last opp en zip-fil")),
@@ -40,7 +42,10 @@ sidebar <- shinydashboard::dashboardSidebar(
                                      "Bog / Nedbørsmyr" = "bog",
                                      "Fen / Myr" = "fen")),
              
-             uiOutput("specific_peatland_type")
+             uiOutput("specific_peatland_type"),
+             
+             actionButton(inputId = "run_values_gran_data",
+                          label = i18n$t("Last verdier"))
       ),
              
              
@@ -60,13 +65,10 @@ sidebar <- shinydashboard::dashboardSidebar(
                           value = 0.5,
                           step = 0.01
              ),
-             actionButton(inputId = "run_values",
+             actionButton(inputId = "run_values_custom",
                           label = i18n$t("Last verdier"))
             )
     ),
-    
-    
-    menuItem(i18n$t("Bruksanvisning"), tabName = "instruction", icon = icon("comment")),
     
     menuItem(i18n$t("Resultater"), tabName = "tables", icon = icon("th")
              ),

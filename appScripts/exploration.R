@@ -160,3 +160,19 @@ as.vector(unlist(a[1]))
 a[1]
 
 fread()
+
+
+
+#create data frame
+df <- data.frame(x=c(99, 90, 86, 88, 95),
+                 y=c(33, 28, 31, 39, 34),
+                 Dybde=c(30, 28, 24, 24, 28),
+                 a=c(1,1,1,1,1))
+
+#view data frame
+names(df) <- tolower(names(df))
+df
+columns <- c("x", "y", "dybde")
+
+sum(tolower(names(df)) %in% columns )
+

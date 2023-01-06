@@ -9,7 +9,7 @@ interpolation <- function(shp, dfsp){
   grid_sp <-as(grid, "SpatialPixels") 
   grid_crop <- grid_sp[shp,] 
   
-  neighbors = length(dfsp$Dybde)
+  neighbors = length(dfsp$dybde)
   power = c((0.5), seq(from = 1, to = 4, by = 1))
   neigh = c((1), seq(from=2,to=30,by = 2), c(length=(neighbors)))
   
@@ -25,7 +25,7 @@ interpolation <- function(shp, dfsp){
         
         run = paste(i, j, sep="_")
         
-        temp2 <- idw(Dybde ~ 1, dfsp, grid_crop, nmax=j, idp=i)
+        temp2 <- idw(dybde ~ 1, dfsp, grid_crop, nmax=j, idp=i)
         temp3 <- as.data.frame(temp2@data)
         temp4 <- sum(temp3$var1.pred)
         temp5 <- cbind(run, temp4)
@@ -56,7 +56,7 @@ interpolation <- function(shp, dfsp){
   Description <- c("mean", "min", "max", "SD", "sum")
   results_volume <- data.frame(Description, Results = c(mean, min, max, sd, s)) 
   
-  interpolation <- idw(Dybde ~ 1, dfsp, grid_crop, nmax=30, idp=3)
+  interpolation <- idw(dybde ~ 1, dfsp, grid_crop, nmax=30, idp=3)
   interpolation <- raster(interpolation)
   
   # Return the interpolation and the result volume
@@ -67,6 +67,67 @@ interpolation <- function(shp, dfsp){
 #######################
 # SOME ERROR HANDLING #
 #######################
+
+# Error message when checking if the .zip file contain the necessary files
+print_no_shp <- function(){
+  showModal(modalDialog(
+    title = "SHP input error",
+    "The uploaded .zip file does not contain any .shp file",
+    easyClose = TRUE
+  ))
+}
+
+print_no_prj <- function(){
+  showModal(modalDialog(
+    title = "SHP input error",
+    "The uploaded .zip file does not contain any .prj file containing the 
+    information on the Coordinate Reference System",
+    easyClose = TRUE
+  ))
+}
+
+print_no_csv <- function(){
+  showModal(modalDialog(
+    title = "CSV input error",
+    "The uploaded .zip file does not contain any .csv file containing the coordinates and the depth of the sampled sites",
+    easyClose = TRUE
+  ))
+}
+
+print_error_incompatible_file <- function(){
+  showModal(modalDialog(
+    title = "Input error",
+    "Please upload a dataset before clicking on 'load dataset'. 
+          The dataset should be a zip file containing both a shapefile with the 
+          extent of the area of interest and a csv file containing peat depth measures 
+          (in m) taken at the site with coordinates for each measure (given in UTM 32 N, EPSG:25832). 
+          For more information refer to the README.",
+    easyClose = TRUE
+  ))
+}
+
+print_error_csv_columns <- function(){
+  showModal(modalDialog(
+    title = "CSV input error",
+    "The CSV file uploaded is not formatted correctly. Please make sure that it contains at least 
+    the coordinates (x and y) and the depth of the sampled sites (dybde). In any doubts, refer to the README.",
+    easyClose = TRUE
+  ))
+}
+
+open_shapefile <- function(filename) {
+  tryCatch({
+    shp <- readOGR(filename) %>% st_as_sf()
+    return(shp)
+  }, warning = function(e) {
+    showModal(modalDialog(
+      title = "SHP input error",
+      "The .shp file uploaded is not formatted correctly and could not be opened. Please make sure that the uploaded .zip contains
+      a valid shapefile. In any doubts, refer to the README.",
+      easyClose = TRUE
+    ))
+  })
+}
 
 open_csv <- function(filename) {
   tryCatch({
@@ -89,15 +150,7 @@ transform_to_sf <- function(df) {
 }
 
 
-#error = function(e) {
-#  message(e$message)
-#  showModal(modalDialog(
-#    title = "Input error",
-#    "Could not transform data frame given the set of coordinates",
-#    easyClose = TRUE
-#  ))
-#  return(0)
-#}
+
 
 
 

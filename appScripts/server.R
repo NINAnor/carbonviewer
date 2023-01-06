@@ -33,52 +33,69 @@ server <- function(input, output, session){
   df_reactive$c_stock <- "Not computed"
   
   observeEvent(input$unzip, {
+    
+    do.call(file.remove, list(list.files("BASE", full.names = TRUE)))
 
     if (is.null(input$upload_zip$datapath)) {
-      showModal(modalDialog(
-          title = "Input error",
-          "Please upload a dataset before clicking on 'load dataset'. 
-          The dataset should be a zip file containing both a shapefile with the 
-          extent of the area of interest and a csv file containing peat depth measures 
-          (in m) taken at the site with coordinates for each measure (given in UTM 32 N, EPSG:25832). 
-          For more information refer to the README.",
-          easyClose = TRUE
-        ))
+      print_error_incompatible_file()
     }
     else {
       # unzip the file
       unzip (input$upload_zip$datapath, exdir = file.path(BASE))
     
       shp_file <- list.files(BASE, pattern = '.shp', recursive = TRUE)
+      prj_file <- list.files(BASE, pattern = '.prj', recursive = TRUE)
       csv_file <- list.files(BASE, pattern = '.csv', recursive = TRUE)
       
-      shp <- readOGR(paste0(BASE, "/", shp_file)) %>% st_as_sf()
-      
-      # Check if the shapefile has a CRS / IF NOT WE ASSUME THAT THE CRS
-      # IS 25832 AS SPECIFIED ON THE README
-      if (is.na(st_crs(shp))) {
-        print("The object does not have a CRS, assigning a CRS")
-        shp <- shp %>% st_set_crs(25832)
-        } 
-      else {
-        print("The object has a CRS")
+      # Check if there is both a shapefile and a CSV
+      if (length(shp_file) == 0){
+        print_no_shp()
       }
-      
-      df <- open_csv(paste0(BASE, "/", csv_file)) 
-      dfs <- transform_to_sf(df) %>% st_set_crs(st_crs(shp))
-      dfs <- dfs %>% st_transform(25832)
-      shp <- shp %>% st_transform(25832)
-      
-      # Interpolation (take only "sp" objects, hence the conversion)
-      shp_sp <- as(shp, Class='Spatial')
-      dfsp <- as(dfs, Class="Spatial")
-      interp <- interpolation(shp_sp, dfsp)
-      
-      # Fill the DF reactive
-      df_reactive$shape <- shp
-      df_reactive$points <- dfs
-      df_reactive$results_volume <- interp[[1]]
-      df_reactive$interpolation_raster <- interp[[2]]
+      else if (length(prj_file) == 0){
+        print_no_prj()
+      }
+      else if (length(csv_file) == 0){
+        print_no_csv()
+      }
+      else{
+        shp <- open_shapefile(paste0(BASE, "/", shp_file))
+        
+        # Check if the shapefile has a CRS / IF NOT WE ASSUME THAT THE CRS
+        # IS 25832 AS SPECIFIED ON THE README
+        if (is.na(st_crs(shp))) {
+          print("The object does not have a CRS, assigning a CRS")
+          shp <- shp %>% st_set_crs(25832)
+          } 
+        else {
+          print("The object has a CRS")
+        }
+        
+        df <- open_csv(paste0(BASE, "/", csv_file)) 
+        names(df) <- tolower(names(df))
+        
+        # Check that the CSV contains the necessary columns (x,y, dybde)
+        necessary_columns <- c("x","y","dybde")
+        
+        if (sum(names(df) %in% necessary_columns) != 3){
+          print_error_csv_columns()
+        }
+        else{
+          dfs <- transform_to_sf(df) %>% st_set_crs(st_crs(shp))
+          dfs <- dfs %>% st_transform(25832)
+          shp <- shp %>% st_transform(25832)
+          
+          # Interpolation (take only "sp" objects, hence the conversion)
+          shp_sp <- as(shp, Class='Spatial')
+          dfsp <- as(dfs, Class="Spatial")
+          interp <- interpolation(shp_sp, dfsp)
+          
+          # Fill the DF reactive
+          df_reactive$shape <- shp
+          df_reactive$points <- dfs
+          df_reactive$results_volume <- interp[[1]]
+          df_reactive$interpolation_raster <- interp[[2]]
+        }
+      }
     }
   })
   
@@ -117,7 +134,7 @@ server <- function(input, output, session){
     # Isolate Soil Organic Matter and Bulk Density values, group them by SAMPLE ID2 (because
     # the sampling has been replicated) and summarise.
     df_num <- df_read %>% 
-      dplyr::select(`SAMPLE ID2`, perc_SOM = as.numeric(`% SOM`), BD = as.numeric(`BD (t/m3)`)) %>% 
+      dplyr::select(`SAMPLE ID2`, perc_SOM = `% SOM`, BD = `BD (t/m3)`) %>% 
       group_by(`SAMPLE ID2`) %>% 
       summarise(across(.fns = list(mean =~ mean(., na.rm=TRUE))))
     
@@ -149,23 +166,23 @@ server <- function(input, output, session){
   # Compute the carbon stock based on either the dataset OR the user input
   cstock <- reactive({
     req(df_reactive$results_volume)
+    req(input$run_values_custom || input$run_values_gran_data)
     
-    if(input$run_values){
+    if(input$run_values_custom){
       c_stock <- df_reactive$results_volume[1,2] * input$organicmatter * input$bulkdensity * input$carboncontent * 1000
     }
-    else{
+    else if (input$run_values_gran_data){
       req(df_reactive$gran_data)
       df <- df_reactive$gran_data()
       c_stock <- df_reactive$results_volume[1,2] * mean(df$perc_SOM_mean / 100) * mean(df$BD_mean) * 0.5 * 1000
     }
-    
-    c_stock <- round(c_stock, 2)
+    c_stock <- round(c_stock, 0)
     df_reactive$c_stock <- c_stock
     return(c_stock)
   })
   
   output$carbonBox <- renderInfoBox({
-    
+
     req(cstock)
     stock <- cstock()
     
