@@ -115,15 +115,18 @@ print_error_csv_columns <- function(){
   ))
 }
 
-open_shapefile <- function(filename) {
+
+# Error message if files are not opened properly
+
+open_shapefile <- function(filename){
   tryCatch({
     shp <- readOGR(filename) %>% st_as_sf()
     return(shp)
-  }, warning = function(e) {
+  }, error = function(e) {
     showModal(modalDialog(
       title = "SHP input error",
-      "The .shp file uploaded is not formatted correctly and could not be opened. Please make sure that the uploaded .zip contains
-      a valid shapefile. In any doubts, refer to the README.",
+      "The SHP file uploaded is invalid. Please make sure that it contains the polygon(s) of the area of interes. 
+            In any doubts, refer to the README.",
       easyClose = TRUE
     ))
   })

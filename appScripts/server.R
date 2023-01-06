@@ -32,6 +32,10 @@ server <- function(input, output, session){
   df_reactive <- reactiveValues()
   df_reactive$c_stock <- "Not computed"
   
+  observeEvent(input$unzip,{
+    do.call(file.remove, list(list.files("BASE", full.names = TRUE)))
+  })
+  
   observeEvent(input$unzip, {
     
     do.call(file.remove, list(list.files("BASE", full.names = TRUE)))
@@ -58,8 +62,9 @@ server <- function(input, output, session){
         print_no_csv()
       }
       else{
-        shp <- open_shapefile(paste0(BASE, "/", shp_file))
         
+        shp <- open_shapefile(paste0(BASE, "/", shp_file))
+                              
         # Check if the shapefile has a CRS / IF NOT WE ASSUME THAT THE CRS
         # IS 25832 AS SPECIFIED ON THE README
         if (is.na(st_crs(shp))) {
