@@ -119,3 +119,44 @@ tm_shape(interpolation) +
             legend.position = c("left", "top"))
 
 
+###################
+# REPROJECT TYDAL #
+###################
+library(sf)
+
+shp <- readOGR("/home/rstudio/app/data_exple/Tydal/stasjon_Setermyra.shp") %>% st_as_sf()
+shp_reproj <- shp %>% st_transform(25832)
+
+df <- read.csv2("/home/rstudio/app/data_exple/Tydal/Torvdybder_Tydal.csv") 
+dfs <- st_as_sf(x = df,
+                coords = c("x", "y"))
+dfs_reproj <- dfs %>% st_transform(25832)
+
+
+st_write(shp_reproj, "/home/rstudio/app/data_exple/test_shapefile.shp")
+st_write(dfs_reproj, "/home/rstudio/app/data_exple/test_dataset/test_depths_samples.csv",
+         layer_options = "GEOMETRY=AS_XY")
+
+
+mapview(dfs)
+
+
+
+st_crs(shp)
+st_crs(25832)
+
+
+st
+
+
+coor <- data.frame(a = c("x", "X"), b = c("y", "Y"))
+
+for( cols in 1:length(coor)){
+  a = as.vector(unlist(coor[cols,]))
+
+}
+a
+as.vector(unlist(a[1]))
+a[1]
+
+fread()

@@ -34,61 +34,39 @@ server <- function(input, output, session){
   
   ##### IN CONSTRUCTION ####
   observeEvent(input$unzip, {
-    tryCatch({
+
     unzip (input$upload_zip$datapath, exdir = file.path(BASE))
     
     shp_file <- list.files(BASE, pattern = '.shp', recursive = TRUE)
     csv_file <- list.files(BASE, pattern = '.csv', recursive = TRUE)
     
-    shp <- readOGR(paste0(BASE, "/", shp_file)) %>% 
-      st_as_sf()
-    st_crs(shp) <- 25832
+    shp <- readOGR(paste0(BASE, "/", shp_file)) %>% st_as_sf()
     
-    df <- read.csv2(paste0(BASE, "/", csv_file)) 
-    dfs <- st_as_sf(x = df,
-                    coords = c("x", "y"),
-                    crs = "+init=epsg:25832")
-
+    # Check if the shapefile has a CRS / IF NOT WE ASSUME THAT THE CRS
+    # IS 25832 AS SPECIFIED ON THE README
+    if (is.na(st_crs(shp))) {
+      print("The object does not have a CRS, assigning a CRS")
+      shp <- shp %>% st_set_crs(25832)
+      } 
+    else {
+      print("The object has a CRS")
+    }
+    
+    df <- open_csv(paste0(BASE, "/", csv_file)) 
+    dfs <- transform_to_sf(df) %>% st_set_crs(st_crs(shp))
+    dfs <- dfs %>% st_transform(25832)
+    shp <- shp %>% st_transform(25832)
+    
+    # Interpolation (take only "sp" objects, hence the conversion)
+    shp_sp <- as(shp, Class='Spatial')
+    dfsp <- as(dfs, Class="Spatial")
+    interp <- interpolation(shp_sp, dfsp)
+    
+    # Fill the DF reactive
     df_reactive$shape <- shp
     df_reactive$points <- dfs
-    }, 
-    error = function(e) {
-      message(e$message)
-      showModal(modalDialog(
-        title = "Input error",
-        "Please upload a dataset before clicking on 'load dataset'. 
-        The dataset should be a zip file containing both a shapefile with the extent of the area 
-        of interest and a csv file containing peat depth measures (in m) taken at the site with coordinates 
-        for each measure (given in UTM 32 N, EPSG:25832)",
-        easyClose = TRUE
-      ))
-      return(0)
-    }
-    )
-    
-  })
-  
-  observeEvent(input$run_upload, {
-    
-    tryCatch({
-    
-    interp <- interpolation(BASE)
     df_reactive$results_volume <- interp[[1]]
     df_reactive$interpolation_raster <- interp[[2]]
-    }, 
-    error = function(e) {
-      message(e$message)
-      showModal(modalDialog(
-        title = "Interpolation error",
-        "Please make sure the uploaded dataset respect the required format. 
-        The dataset should be a zip file containing both a shapefile with the extent of the area 
-        of interest and a csv file containing peat depth measures (in m) taken at the site with coordinates 
-        for each measure (given in UTM 32 N, EPSG:25832)",
-        easyClose = TRUE
-      ))
-      return(0)
-    }
-    )
   })
   
   ############################

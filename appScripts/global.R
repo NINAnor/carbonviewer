@@ -2,27 +2,10 @@
 # DO THE INTERPOLATION OF THE DATASET #
 #######################################
 
-interpolation <- function(BASE){
-  
-  shp_file <- list.files(BASE, pattern = '.shp', recursive = TRUE)
-  csv_file <- list.files(BASE, pattern = '.csv', recursive = TRUE)
-  
-  shp <- readOGR(paste0(BASE, "/", shp_file))
-  proj4string(shp) <- crs("+init=epsg:25832")
-  
-  df <- read.csv2(paste0(BASE, "/", csv_file)) 
-  dfs <- st_as_sf(x = df,
-                  coords = c("x", "y"),
-                  crs = "+init=epsg:25832")
-  sf_shp <- shp %>% st_as_sf()
-  dfsp <- as(dfs, Class="Spatial")
-  
-  #################
-  # Interpolation #
-  #################
+interpolation <- function(shp, dfsp){
   grid <- raster(extent(shp)) 
   res(grid) <- 1 
-  proj4string(grid)<-crs(dfs) 
+  proj4string(grid)<-crs(dfsp) 
   grid_sp <-as(grid, "SpatialPixels") 
   grid_crop <- grid_sp[shp,] 
   
@@ -81,9 +64,40 @@ interpolation <- function(BASE){
   return(l_results)
 }
 
+#######################
+# SOME ERROR HANDLING #
+#######################
+
+open_csv <- function(filename) {
+  tryCatch({
+      df <- fread(filename)
+      return(df)
+    }, error = function(e) {})
+  stop("Could not open the file")
+}
 
 
+transform_to_sf <- function(df) {
+  coord_columns <- list(c("X", "Y"), c("x", "y"))
+  for (cols in coord_columns) {
+    tryCatch({
+      sf_df <- st_as_sf(df, coords = cols)
+      return(sf_df)
+    }, error = function(e) {})
+  }
+  stop("Could not transform the file with any of the following coordinates: ", cols)
+}
 
+
+#error = function(e) {
+#  message(e$message)
+#  showModal(modalDialog(
+#    title = "Input error",
+#    "Could not transform data frame given the set of coordinates",
+#    easyClose = TRUE
+#  ))
+#  return(0)
+#}
 
 
 

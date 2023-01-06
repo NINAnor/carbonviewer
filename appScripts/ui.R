@@ -28,8 +28,7 @@ sidebar <- shinydashboard::dashboardSidebar(
                 fileInput(inputId = "upload_zip",
                            label = i18n$t(shiny::HTML("Last opp en zip-fil")),
                           accept = ".zip"),
-                actionButton(inputId = "unzip", label = i18n$t("Last inn datasett")),
-                actionButton(inputId = "run_upload", label = i18n$t("Beregn volum"))
+                actionButton(inputId = "unzip", label = i18n$t("Last inn datasett"))
              ),
     
     menuItem(i18n$t("Torvegenskaper"), tabName = "carbonchar", icon = icon('keyboard'),
