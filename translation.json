@@ -28,6 +28,7 @@
 	    {"no": "Kart med interpolerte torvdybder", "en": "Map of interpolated peat depths"},
 	    {"no": "Dybde", "en": "Depth"},
 	    {"no": "Bruksanvisning", "en": "Instructions"},
-      {"no": "Last verdier", "en": "Load values"}
+      {"no": "Last verdier", "en": "Load values"},
+      {"no": "Nullstille", "en": "Reset"}
     ]
 }
