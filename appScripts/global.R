@@ -119,17 +119,20 @@ print_error_csv_columns <- function(){
 # Error message if files are not opened properly
 
 open_shapefile <- function(filename){
-  tryCatch({
+  
     shp <- readOGR(filename) %>% st_as_sf()
-    return(shp)
-  }, error = function(e) {
-    showModal(modalDialog(
-      title = "SHP input error",
-      "The SHP file uploaded is invalid. Please make sure that it contains the polygon(s) of the area of interes. 
+    
+    if (length(shp) == 0){
+      showModal(modalDialog(
+        title = "SHP input error",
+        "The SHP file uploaded is invalid. Please make sure that it contains the polygon(s) of the area of interest. 
             In any doubts, refer to the README.",
-      easyClose = TRUE
-    ))
-  })
+        easyClose = TRUE
+      ))
+    }
+    else {
+      return(shp)
+    }
 }
 
 open_csv <- function(filename) {
