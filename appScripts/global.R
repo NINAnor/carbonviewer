@@ -11,26 +11,25 @@ interpolation <- function(shp, dfsp){
   
   neighbors = length(dfsp$dybde)
   power = c((0.5), seq(from = 1, to = 4, by = 1))
-  neigh = c((1), seq(from=2,to=30,by = 2), c(length=(neighbors)))
+  neigh = 30 
   
   temp <- data.frame()
   
   withProgress(message = i18n$t("Beregn volum"), {
     for (i in power) {
-      for (j in neigh) {
         
         temp2 <- NULL
         temp3 <- NULL
         temp4 <- NULL
         
-        run = paste(i, j, sep="_")
+        run = paste(i, sep="_")
         
-        temp2 <- idw(dybde ~ 1, dfsp, grid_crop, nmax=j, idp=i)
+        temp2 <- idw(dybde ~ 1, dfsp, grid_crop, nmax=neigh, idp=i)
         temp3 <- as.data.frame(temp2@data)
         temp4 <- sum(temp3$var1.pred)
         temp5 <- cbind(run, temp4)
         temp  <- rbind(temp, temp5)
-      }
+
       Sys.sleep(0.5)
       incProgress(1 / length(power))
     } 
