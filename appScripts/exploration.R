@@ -16,7 +16,7 @@ myGrid <- sf::st_crop(myGrid, shp)
 powerRange <- 1:6
 nmax <- 20
 
-for(i in powerRange){
+for(i in 2){
   
   # Get the MAE
   temp2 <- gstat::krige.cv(Dybde ~ 1, dfs, set = list(idp=i), nmax = nmax)

@@ -29,6 +29,8 @@
 	    {"no": "Dybde", "en": "Depth"},
 	    {"no": "Bruksanvisning", "en": "Instructions"},
       {"no": "Last verdier", "en": "Load values"},
-      {"no": "Nullstille", "en": "Reset"}
+      {"no": "Nullstille", "en": "Reset"},
+      {"no": "Makt innstilling", "en": "Power setting"},
+      {"no": "Makt verdi", "en": "Power value"}
     ]
 }

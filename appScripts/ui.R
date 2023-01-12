@@ -71,6 +71,11 @@ sidebar <- shinydashboard::dashboardSidebar(
             )
     ),
     
+    menuItem(i18n$t("Makt innstilling"), tabName = "powersetting", icon = icon('hand-fist'),
+             sliderInput(inputId = "power", i18n$t("Makt verdi"),
+                         min = 1, max = 6, value = 1
+             )),
+    
     menuItem(i18n$t("Resultater"), tabName = "tables", icon = icon("th")
              ),
     

@@ -2,6 +2,21 @@
 # DO THE INTERPOLATION OF THE DATASET #
 #######################################
 
+compute_volume_slider <- function(peatDepths,
+                                  peatlandDelimination,
+                                  power){
+  
+  myGrid <- starsExtra::make_grid(peatlandDelimination, 1)
+  myGrid <- sf::st_crop(myGrid, peatlandDelimination)
+  
+  vol <- gstat::idw(dybde ~ 1, peatDepths, 
+                             newdata=myGrid, 
+                             nmax=nmax, 
+                             idp=power)
+
+  return(sum(vol$var1.pred, na.rm=T))
+}
+
 interpolation <- function(peatDepths,
                           peatlandDelimination,
                           powerRange = 1:6,
@@ -59,7 +74,7 @@ interpolation <- function(peatDepths,
              nmax = nmax)
 
   # Return the interpolation and the result volume
-  l_results <- list(v, idweights)
+  l_results <- list(v, idweights, best)
   return(l_results)
 }
 

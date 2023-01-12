@@ -114,6 +114,8 @@ server <- function(input, output, session){
             df_reactive$points <- dfs
             df_reactive$volume <- interp[[1]]
             df_reactive$interpolation_raster <- interp[[2]]
+            
+            updateSliderInput(session, "power", value=interp[[3]])
           }
         }
       }
@@ -124,6 +126,21 @@ server <- function(input, output, session){
       session$reload()
       return(NULL)}
   })
+  
+  ###################################################
+  # IF SLIDER INPUT OVERRIDE PREVIOUS INTERPOLATION #
+  ###################################################
+  
+  observeEvent(input$power, {
+    req(df_reactive$volume)
+    req(input$power)
+    
+    v <- compute_volume_slider(df_reactive$points,
+                          df_reactive$shape,
+                          input$power)
+    
+    df_reactive$volume <- v
+    })
   
   ############################
   # CALCULATE CARBON CONTENT #
