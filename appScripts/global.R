@@ -2,64 +2,64 @@
 # DO THE INTERPOLATION OF THE DATASET #
 #######################################
 
-interpolation <- function(shp, dfsp){
-  grid <- raster(extent(shp)) 
-  res(grid) <- 1 
-  proj4string(grid)<-crs(dfsp) 
-  grid_sp <-as(grid, "SpatialPixels") 
-  grid_crop <- grid_sp[shp,] 
+interpolation <- function(peatDepths,
+                          peatlandDelimination,
+                          powerRange = 1:6,
+                          nmax = 20){
   
-  neighbors = length(dfsp$dybde)
-  power = c((0.5), seq(from = 1, to = 4, by = 1))
-  neigh = 30 
+  temp <- data.frame(power = powerRange,
+                     MAE = as.numeric(NA))
   
-  temp <- data.frame()
+  peatDepths <- as(peatDepths, "Spatial")
+  
+  vol <- NULL
+  
+  myGrid <- starsExtra::make_grid(peatlandDelimination, 1)
+  myGrid <- sf::st_crop(myGrid, peatlandDelimination)
   
   withProgress(message = i18n$t("Beregn volum"), {
-    for (i in power) {
-        
-        temp2 <- NULL
-        temp3 <- NULL
-        temp4 <- NULL
-        
-        run = paste(i, sep="_")
-        
-        temp2 <- idw(dybde ~ 1, dfsp, grid_crop, nmax=neigh, idp=i)
-        temp3 <- as.data.frame(temp2@data)
-        temp4 <- sum(temp3$var1.pred)
-        temp5 <- cbind(run, temp4)
-        temp  <- rbind(temp, temp5)
+    for(i in powerRange){
 
+      # Get the MAE
+      temp2 <- gstat::krige.cv(dybde ~ 1, peatDepths, set = list(idp=i), nmax = nmax)
+      temp$MAE[temp$power==i] <- mean(abs(temp2$residual))
+      
+      #  Get the volume
+      vol_temp <- gstat::idw(dybde ~ 1, peatDepths, 
+                             newdata=myGrid, 
+                             nmax=nmax, 
+                             idp=i)
+      
+      vol <- c(vol, sum(vol_temp$var1.pred, na.rm=T))
+      
       Sys.sleep(0.5)
-      incProgress(1 / length(power))
-    } 
+      incProgress(1 / length(powerRange))
+      }
   })
   
-  volume <- temp
-  volume <-dplyr::rename(volume, volume=temp4)
-  volume <- tidyr::separate(volume, 
-                            run, 
-                            into = c("power", "nn"),
-                            sep = "_",
-                            remove=F)
-  volume$power <- as.numeric(volume$power)
-  volume$nn <- as.numeric(volume$nn)
-  volume$volume <- as.numeric(volume$volume)
+  ifelse(temp$power[which.min(temp$MAE)]<2,
+         temp$best <- ifelse(temp$power==2, "best", "not-best"),
+         temp$best <- ifelse(temp$MAE==min(temp$MAE), "best", "not-best")
+  )
   
-  s <- sum(volume$volume)
-  max <- max(volume$volume)
-  min <- min(volume$volume)
-  mean <- mean(volume$volume)
-  sd <- sd(volume$volume)
+  best <- temp %>% filter(best == "best")
+  best <- best$power
   
-  Description <- c("mean", "min", "max", "SD", "sum")
-  results_volume <- data.frame(Description, Results = c(mean, min, max, sd, s)) 
-  
-  interpolation <- idw(dybde ~ 1, dfsp, grid_crop, nmax=30, idp=3)
-  interpolation <- raster(interpolation)
-  
+  # Plot volume
+  vol_df <- data.frame("volume" = vol,
+                       "power" = powerRange)
+  vol_df$relative_volume <- vol_df$volume/mean(vol_df$volume)*100
+  v <- vol_df %>% filter(power == best)
+  v <- v$volume
+    
+  idweights <- gstat::idw(formula = dybde ~ 1, 
+             locations = peatDepths, 
+             newdata = myGrid, 
+             idp=4,
+             nmax = nmax)
+
   # Return the interpolation and the result volume
-  l_results <- list(results_volume, interpolation)
+  l_results <- list(v, idweights)
   return(l_results)
 }
 

@@ -107,14 +107,12 @@ server <- function(input, output, session){
             shp <- shp %>% st_transform(25832)
             
             # Interpolation (take only "sp" objects, hence the conversion)
-            shp_sp <- as(shp, Class='Spatial')
-            dfsp <- as(dfs, Class="Spatial")
-            interp <- interpolation(shp_sp, dfsp)
+            interp <- interpolation(dfs, shp)
             
             # Fill the DF reactive
             df_reactive$shape <- shp
             df_reactive$points <- dfs
-            df_reactive$results_volume <- interp[[1]]
+            df_reactive$volume <- interp[[1]]
             df_reactive$interpolation_raster <- interp[[2]]
           }
         }
@@ -193,16 +191,16 @@ server <- function(input, output, session){
   
   # Compute the carbon stock based on either the dataset OR the user input
   cstock <- reactive({
-    req(df_reactive$results_volume)
+    req(df_reactive$volume)
     req(input$run_values_custom || input$run_values_gran_data)
     
     if(input$run_values_custom){
-      c_stock <- df_reactive$results_volume[1,2] * input$organicmatter * input$bulkdensity * input$carboncontent * 1000
+      c_stock <- df_reactive$volume * input$organicmatter * input$bulkdensity * input$carboncontent * 1000
     }
     else if (input$run_values_gran_data){
       req(df_reactive$gran_data)
       df <- df_reactive$gran_data()
-      c_stock <- df_reactive$results_volume[1,2] * mean(df$perc_SOM_mean / 100) * mean(df$BD_mean) * 0.5 * 1000
+      c_stock <- df_reactive$volume * mean(df$perc_SOM_mean / 100) * mean(df$BD_mean) * 0.5 * 1000
     }
     c_stock <- round(c_stock, 0)
     df_reactive$c_stock <- c_stock
@@ -284,13 +282,16 @@ server <- function(input, output, session){
       tag.map.title, i18n$t(HTML("Kart med interpolerte torvdybder"))
     )
     
+    # Some leaflet functions don't work with STARS objects
+    idw_r <- as(df_reactive$interpolation_raster, "Raster")
+    
     pal = colorNumeric(palette = "magma", 
-                       values(df_reactive$interpolation_raster),  na.color = "transparent",
+                       values(idw_r),  na.color = "transparent",
                        reverse = TRUE)
     
     leaflet() %>% addTiles() %>%
-      addRasterImage(df_reactive$interpolation_raster, colors = pal) %>% 
-      addLegend(pal = pal, values = values(df_reactive$interpolation_raster),
+      addStarsImage(df_reactive$interpolation_raster, colors = pal) %>% 
+      addLegend(pal = pal, values = values(idw_r),
                 title = i18n$t("Dybde")) %>% 
       addControl(title, position = "topleft", className="map-title")
     
@@ -327,13 +328,10 @@ server <- function(input, output, session){
   # DO THE CALCULATIONS IN THE PASTE0
   output$volumeBox <- renderInfoBox({
     
-    req(df_reactive$results_volume)
+    req(df_reactive$volume)
     
     infoBox(
-      i18n$t("Volum"), HTML(paste("min:", round(df_reactive$results_volume[2,2],2), "m3", br(),
-                           "mean:", round(df_reactive$results_volume[1,2],2), "m3", br(),
-                           "max:", round(df_reactive$results_volume[3,2], 2), "m3",  br(),
-                           "SD:", round(df_reactive$results_volume[4,2],3), "m3")), icon = icon("shapes"),
+      i18n$t("Volum"), HTML(paste(round(df_reactive$volume, 0), "m3")), icon = icon("shapes"),
       color = "orange"
     )
   })
@@ -369,7 +367,7 @@ server <- function(input, output, session){
   
   result_csv <- reactive({
     
-    results <- df_reactive$results_volume %>% mutate(units = "m3")
+    results <- df_reactive$volume %>% mutate(units = "m3")
     area <- tibble(Description = "area", Results = df_reactive$area, units = "m2")
     c_stock <- tibble(Description = "carbon_stock", Results = df_reactive$c_stock, units = "Kg")
     results <- rbind(results, area, c_stock)
