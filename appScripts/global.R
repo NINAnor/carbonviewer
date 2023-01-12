@@ -60,7 +60,10 @@ interpolation <- function(peatDepths,
   best <- temp %>% filter(best == "best")
   best <- best$power
   
-  # Plot volume
+  
+  ###############
+  # Plot volume #
+  ###############
   vol_df <- data.frame("volume" = vol,
                        "power" = powerRange)
   vol_df$relative_volume <- vol_df$volume/mean(vol_df$volume)*100
@@ -72,9 +75,51 @@ interpolation <- function(peatDepths,
              newdata = myGrid, 
              idp=4,
              nmax = nmax)
+  
+  ######################
+  # Plot Power results #
+  ######################
+  # Plot MAE vs power
+  gg_out <- ggplot(temp, aes(x = power, y = MAE,
+                             colour = best,
+                             shape = best))+
+    geom_point(size=10)+
+    theme_bw(base_size = 12)+
+    scale_x_continuous(breaks = powerRange)+
+    guides(colour="none",
+           shape = "none")+
+    scale_color_manual(values = c("darkgreen","grey"))+
+    scale_shape_manual(values = c(18, 19))
+  
+  # Plot relative volume vs power
+  gg_out_vol <- ggplot(vol_df, aes(x = factor(power), y = relative_volume))+
+    geom_point(size=8)+
+    xlab("power")+
+    ylab("Peat volume as a percentage of\nmean predicted peat volume")+
+    theme_bw(base_size = 12)
 
   # Return the interpolation and the result volume
-  l_results <- list(v, idweights, best)
+  l_results <- list(v, idweights, best, gg_out, gg_out_vol)
+  return(l_results)
+}
+
+###############################################
+# COMPUTE CARBON STOCKS IF USING BASE DATASET #
+###############################################
+
+ccalc_cStocks <- function(volume,
+                          perc_SOM_mean,
+                          BD_mean){
+  temp_stocks <- NULL
+  
+  for(i in 1:1000){
+    temp <-   volume * 
+      mean(sample(perc_SOM_mean, replace = T) / 100) * 
+      mean(sample(BD_mean, replace = T) * 0.5)
+    
+    temp_stocks <- c(temp_stocks, temp)
+  }
+  l_results <- list(mean(temp_stocks), sd(temp_stocks))
   return(l_results)
 }
 

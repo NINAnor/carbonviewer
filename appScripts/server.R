@@ -116,6 +116,9 @@ server <- function(input, output, session){
             df_reactive$interpolation_raster <- interp[[2]]
             
             updateSliderInput(session, "power", value=interp[[3]])
+            
+            df_reactive$maeVSpower <- interp[[4]]
+            df_reactive$volumeVSpower <- interp[[5]]
           }
         }
       }
@@ -141,6 +144,20 @@ server <- function(input, output, session){
     
     df_reactive$volume <- v
     })
+  
+  #######################
+  # PLOTS FOR THE POWER #
+  #######################
+  
+  output$maeVSpower <- renderPlot({
+    req(df_reactive$maeVSpower)
+    return(df_reactive$maeVSpower)
+  })
+  
+  output$volumeVSpower <- renderPlot({
+    req(df_reactive$volumeVSpower)
+    return(df_reactive$volumeVSpower)
+  })
   
   ############################
   # CALCULATE CARBON CONTENT #
@@ -187,6 +204,7 @@ server <- function(input, output, session){
       dplyr::select(`SAMPLE ID2`, `General Peatland Type`, `Specific Peatland Type`) %>% 
       group_by(`SAMPLE ID2`) %>% 
       unique()
+    
     df = full_join(df_num, df_info, by = "SAMPLE ID2") %>% drop_na()
     
     if(input$g_peatland_type != "unknown"){
@@ -203,34 +221,46 @@ server <- function(input, output, session){
       }
       df <- df %>% filter(`Specific Peatland Type` %in% target)
     }
+    print(df)
     return(df)
      })
   
   # Compute the carbon stock based on either the dataset OR the user input
   cstock <- reactive({
+    
     req(df_reactive$volume)
     req(input$run_values_custom || input$run_values_gran_data)
     
     if(input$run_values_custom){
-      c_stock <- df_reactive$volume * input$organicmatter * input$bulkdensity * input$carboncontent * 1000
+      c_stock_mean <- df_reactive$volume * input$organicmatter * input$bulkdensity * input$carboncontent # * 1000
+      c_stock_mean <- round(c_stock_mean, 0)
+      c_stock_sd <- NA
     }
     else if (input$run_values_gran_data){
+      
       req(df_reactive$gran_data)
       df <- df_reactive$gran_data()
-      c_stock <- df_reactive$volume * mean(df$perc_SOM_mean / 100) * mean(df$BD_mean) * 0.5 * 1000
+      
+      #c_stock <- df_reactive$volume * mean(df$perc_SOM_mean / 100) * mean(df$BD_mean) * 0.5 * 1000
+      c_stock_results <- ccalc_cStocks(df_reactive$volume, df$perc_SOM_mean, df$BD_mean)
+      c_stock_mean <- round(c_stock_results[[1]], 0)
+      c_stock_sd <- round(c_stock_results[[2]], 0)
     }
-    c_stock <- round(c_stock, 0)
-    df_reactive$c_stock <- c_stock
-    return(c_stock)
+    
+    df_reactive$c_stock_mean <- c_stock_mean
+    df_reactive$c_stock_sd <- c_stock_sd
+    return(list(c_stock_mean, c_stock_sd))
   })
   
   output$carbonBox <- renderInfoBox({
 
     req(cstock)
     stock <- cstock()
+    stock_mean <- stock[[1]]
+    stock_sd <- stock[[2]]
     
     infoBox(
-      i18n$t("Karboninnhold"), HTML(paste(stock, "Kg")), icon = icon("equals"),
+      i18n$t("Karboninnhold"), HTML(paste("mean: ", stock_mean, "Kg", br(), "sd: ", stock_sd, "Kg")), icon = icon("equals"),
       color = "orange"
     )
   })
