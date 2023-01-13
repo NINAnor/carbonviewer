@@ -30,6 +30,7 @@ sidebar <- shinydashboard::dashboardSidebar(
                 fileInput(inputId = "upload_zip",
                            label = i18n$t(shiny::HTML("Last opp en zip-fil")),
                           accept = ".zip"),
+                actionButton(inputId = "test", label = i18n$t("Prøv app med testdatasett")),
                 actionButton(inputId = "unzip", label = i18n$t("Last inn datasett")),
                 actionButton(inputId = "reset", label = i18n$t("Nullstille"))
              ),

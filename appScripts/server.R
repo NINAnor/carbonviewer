@@ -40,6 +40,11 @@ server <- function(input, output, session){
     values$upload_state <- 'reset'
   })
   
+  observeEvent(input$test, {
+    
+    values$upload_state <- 'test'
+  })
+  
   # ! PRIMARY PART !
   # Unzip the file and return the dataframe used for the calculations
   # and the plots
@@ -51,15 +56,25 @@ server <- function(input, output, session){
     }
     
     # If a file has been uploaded
-    else if (values$upload_state == 'uploaded') {
+    else if (values$upload_state == 'uploaded' || values$upload_state == 'test') {
     
-      if (is.null(input$upload_zip$datapath)) {
+      if (values$upload_state == 'test'){
+        unzip ("/home/rstudio/app/test_dataset.zip", exdir = file.path(BASE))
+      }
+        # unzip the file
+      else if (values$upload_state == 'uploaded'){
+          if (is.null(input$upload_zip$datapath)) {}
+          else {
+            unzip (input$upload_zip$datapath, exdir = file.path(BASE))
+          }
+      }
+      
+      n_files <- list.files(BASE, recursive = TRUE)
+      
+      if (length(n_files) < 3){
         print_error_incompatible_file()
       }
-      else {
-        # unzip the file
-        unzip (input$upload_zip$datapath, exdir = file.path(BASE))
-      
+      else{
         shp_file <- list.files(BASE, pattern = '.shp', recursive = TRUE)
         prj_file <- list.files(BASE, pattern = '.prj', recursive = TRUE)
         csv_file <- list.files(BASE, pattern = '.csv', recursive = TRUE)
@@ -404,15 +419,15 @@ server <- function(input, output, session){
   
   # Write the raster
   write_raster <- reactive({
-    writeRaster(df_reactive$interpolation_raster, "interpolation_raster", format = "GTiff")
+    write_stars(df_reactive$interpolation_raster, "interpolation_raster.tif")
   })
   
   result_csv <- reactive({
-    
-    results <- df_reactive$volume %>% mutate(units = "m3")
+    results <- tibble(Description = "volume", Results = df_reactive$volume, units = "m3")
     area <- tibble(Description = "area", Results = df_reactive$area, units = "m2")
-    c_stock <- tibble(Description = "carbon_stock", Results = df_reactive$c_stock, units = "Kg")
-    results <- rbind(results, area, c_stock)
+    c_stock_mean <- tibble(Description = "carbon_stock_mean", Results = df_reactive$c_stock_mean, units = "Tons")
+    c_stock_sd <- tibble(Description = "carbon_stock_sd", Results = df_reactive$c_stock_sd, units = "Tons")
+    results <- rbind(results, area, c_stock_mean, c_stock_sd)
 
     write.csv(results, "results.csv")
     

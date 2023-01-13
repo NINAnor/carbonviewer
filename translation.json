@@ -32,6 +32,7 @@
       {"no": "Nullstille", "en": "Reset"},
       {"no": "Makt innstilling", "en": "Power setting"},
       {"no": "Makt verdi", "en": "Power value"},
+      {"no": "Prøv app med testdatasett", "en": "Try app with test dataset"},
       {"no": "Kraftparameteren er satt til sin optimale verdi og brukes til å beregne både volumet av torv og mengden karbon som finnes i området. Likevel er det mulig å endre den for å passe bedre ens formål.", 
       "en": "The power parameter is set at its optimal value and is used to compute both the volume of peat and the amount of carbon contained in the area. Nevertheless, it is possible to change it to better fit one's purpose."}
     ]
