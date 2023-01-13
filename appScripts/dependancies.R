@@ -21,6 +21,7 @@ library(mapview)
 library(shiny.i18n)
 library(tmap)
 library(stars)
+library(starsExtra)
 
 
 # Translation file
