@@ -11,7 +11,7 @@ compute_volume_slider <- function(peatDepths,
   
   vol <- gstat::idw(dybde ~ 1, peatDepths, 
                              newdata=myGrid, 
-                             nmax=nmax, 
+                             nmax=30, 
                              idp=power)
 
   return(sum(vol$var1.pred, na.rm=T))
@@ -20,7 +20,7 @@ compute_volume_slider <- function(peatDepths,
 interpolation <- function(peatDepths,
                           peatlandDelimination,
                           powerRange = 1:6,
-                          nmax = 20){
+                          nmax = 30){
   
   temp <- data.frame(power = powerRange,
                      MAE = as.numeric(NA))

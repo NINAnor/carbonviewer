@@ -16,10 +16,6 @@ server <- function(input, output, session){
   
   # file with translations
   observeEvent(input$selected_language, {
-    # This print is just for demonstration
-    print(input$selected_language)
-    print(paste("Language change!", input$selected_language))
-    # Here is where we update language in session
     shiny.i18n::update_lang(input$selected_language, session)
   })
   
@@ -221,7 +217,6 @@ server <- function(input, output, session){
       }
       df <- df %>% filter(`Specific Peatland Type` %in% target)
     }
-    print(df)
     return(df)
      })
   
@@ -260,7 +255,7 @@ server <- function(input, output, session){
     stock_sd <- stock[[2]]
     
     infoBox(
-      i18n$t("Karboninnhold"), HTML(paste("mean: ", stock_mean, "Kg", br(), "sd: ", stock_sd, "Kg")), icon = icon("equals"),
+      i18n$t("Karboninnhold"), HTML(paste("mean: ", stock_mean, "Tons", br(), "sd: ", stock_sd, "Tons")), icon = icon("equals"),
       color = "orange"
     )
   })
