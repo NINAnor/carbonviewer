@@ -22,6 +22,8 @@ Beskrivelse av appen på [Norsk](#hva-er-carbonviewer)
 
 ## Hvordan bruker jeg denne applikasjonen?
 
+**Merk at et testdatasett er gitt og det er mulig å laste det inn i applikasjonen ved å klikke på "Test app med testdatasett"**
+
 ### Lage kartene
 
 **Etter å ha fulgt alle trinnene beskrevet nedenfor, klikk på fanen `Resultater` for å visualisere resultatene**
@@ -60,6 +62,8 @@ I applikasjonen kan brukeren klikke på `Last ned resultater` og `Last ned`. Det
 The application estimates the total carbon content in the peat body, which can be used to evaluate the soil carbon storage at any given peatland site and the potential impact land-use change can have on CO2 emission. As development in peatland areas may give cause to high greenhouse gas emissions, the aim of this application is to support area planners with an improved knowledge base of the soil carbon in potentially impacted areas. The application should be applied during early planning phases as a tool to map soil carbon stocks in peatlands, to avoid, reduce or mitigate the impact of development in peatlands areas.
 
 ## How to use this application?
+
+**Note that a test dataset is provided and that is is possible to load it in the application by clicking on "Test app with test dataset"**
 
 ### Creating the maps
 
