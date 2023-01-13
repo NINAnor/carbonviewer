@@ -14,7 +14,8 @@ RUN install2.r --error \
     leaflet \
     rintrojs \
     plotly \
-    dashboardthemes 
+    dashboardthemes \
+    starsExtra
     
 RUN R -e "devtools::install_github('hadley/emo')"
 RUN R -e "devtools::install_github('Appsilon/shiny.i18n')"
