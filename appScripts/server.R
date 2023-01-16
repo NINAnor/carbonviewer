@@ -27,6 +27,8 @@ server <- function(input, output, session){
   
   # State variable to know whether a folder has been uploaded
   df_reactive <- reactiveValues()
+  df_reactive$c_stock_mean <- 0
+  df_reactive$c_stock_sd <- 0
   
   values <- reactiveValues(
     upload_state = NULL
@@ -423,11 +425,19 @@ server <- function(input, output, session){
   })
   
   result_csv <- reactive({
+    
     results <- tibble(Description = "volume", Results = df_reactive$volume, units = "m3")
     area <- tibble(Description = "area", Results = df_reactive$area, units = "m2")
-    c_stock_mean <- tibble(Description = "carbon_stock_mean", Results = df_reactive$c_stock_mean, units = "Tons")
-    c_stock_sd <- tibble(Description = "carbon_stock_sd", Results = df_reactive$c_stock_sd, units = "Tons")
-    results <- rbind(results, area, c_stock_mean, c_stock_sd)
+    
+    if (df_reactive$c_stock_mean == 0 && df_reactive$c_stock_sd == 0){
+      results <- rbind(results, area)
+    }
+    
+    else {
+      c_stock_mean <- tibble(Description = "carbon_stock_mean", Results = df_reactive$c_stock_mean, units = "Tons")
+      c_stock_sd <- tibble(Description = "carbon_stock_sd", Results = df_reactive$c_stock_sd, units = "Tons")
+      results <- rbind(results, area, c_stock_mean, c_stock_sd)
+    }
 
     write.csv(results, "results.csv")
     
