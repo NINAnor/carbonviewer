@@ -72,7 +72,7 @@ sidebar <- shinydashboard::dashboardSidebar(
             )
     ),
     
-    menuItem(i18n$t("Makt innstilling"), tabName = "powersetting", icon = icon('hand-fist')
+    menuItem(i18n$t("Valg av power"), tabName = "powersetting", icon = icon('hand-fist')
              ),
     
     menuItem(i18n$t("Resultater"), tabName = "tables", icon = icon("th")
@@ -110,7 +110,7 @@ body <- shinydashboard::dashboardBody(
             )),
     
     tabItem(tabName = "powersetting",
-            box(sliderInput(inputId = "power", i18n$t("Makt verdi"),
+            box(sliderInput(inputId = "power", i18n$t("Power verdi"),
                         min = 1, max = 6, value = 1), width = 6, height = 100),
             box(p(i18n$t("Kraftparameteren er satt til sin optimale verdi og brukes til å beregne både volumet av torv og mengden karbon som finnes i området. Likevel er det mulig å endre den for å passe bedre ens formål.")), 
                 width = 6, height = 100, background = "red"),

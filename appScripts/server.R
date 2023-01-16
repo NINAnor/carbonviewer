@@ -272,7 +272,7 @@ server <- function(input, output, session){
     stock_sd <- stock[[2]]
     
     infoBox(
-      i18n$t("Karboninnhold"), HTML(paste("mean: ", stock_mean, "Tons", br(), "sd: ", stock_sd, "Tons")), icon = icon("equals"),
+      i18n$t("Karboninnhold"), HTML(paste("mean: ", stock_mean, i18n$t("Tonn"), "C", br(), "sd: ", stock_sd, i18n$t("Tonn"), "C")), icon = icon("equals"),
       color = "orange"
     )
   })
