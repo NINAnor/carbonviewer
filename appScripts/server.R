@@ -291,10 +291,19 @@ server <- function(input, output, session){
     stock_mean <- stock[[1]]
     stock_sd <- stock[[2]]
     
+    if(is.na(stock_sd)){
+      infoBox(
+        i18n$t("Karboninnhold"), HTML(paste("mean: ", stock_mean, i18n$t("Tonn"), "C")), icon = icon("equals"),
+        color = "orange"
+      )
+    }
+    
+    else{
     infoBox(
       i18n$t("Karboninnhold"), HTML(paste("mean: ", stock_mean, i18n$t("Tonn"), "C", br(), "sd: ", stock_sd, i18n$t("Tonn"), "C")), icon = icon("equals"),
       color = "orange"
-    )
+      )
+    }
   })
   
   ######################################
