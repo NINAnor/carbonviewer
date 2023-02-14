@@ -73,7 +73,7 @@ interpolation <- function(peatDepths,
   idweights <- gstat::idw(formula = dybde ~ 1, 
              locations = peatDepths, 
              newdata = myGrid, 
-             idp=4,
+             idp=best,
              nmax = nmax)
   
   ######################

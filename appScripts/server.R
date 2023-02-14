@@ -147,6 +147,7 @@ server <- function(input, output, session){
   # IF SLIDER INPUT OVERRIDE PREVIOUS INTERPOLATION #
   ###################################################
   
+  # Overwrite the volume based on input$power
   observeEvent(input$power, {
     req(df_reactive$volume)
     req(input$power)
@@ -157,6 +158,25 @@ server <- function(input, output, session){
     
     df_reactive$volume <- v
     })
+  
+  # Overwrite the interpolation raster based on input$power
+  observeEvent(input$power, {
+    req(df_reactive$points)
+    req(df_reactive$shape)
+    req(df_reactive$interpolation_raster)
+    req(input$power)
+    
+    myGrid <- starsExtra::make_grid(df_reactive$shape, 1)
+    myGrid <- sf::st_crop(myGrid, df_reactive$shape)
+    
+    idweights <- gstat::idw(formula = dybde ~ 1, 
+                            locations = df_reactive$points, 
+                            newdata = myGrid, 
+                            idp=input$power,
+                            nmax = 30)
+    
+    df_reactive$interpolation_raster <- idweights
+  })
   
   #######################
   # PLOTS FOR THE POWER #
