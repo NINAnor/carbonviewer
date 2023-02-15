@@ -430,11 +430,16 @@ server <- function(input, output, session){
   
   # Write the interpolation map
   shot_interp_map <- reactive({
+    
     interp_map <- tm_shape(df_reactive$interpolation_raster) +
       tm_raster(title = i18n$t("Dybde")) +
+      tm_compass() +
+      tm_scale_bar() +
       tm_layout(title= i18n$t("Kart med interpolerte torvdybder"),
-                legend.position = c("left", "top"))
+                legend.outside=T)
+    
     tmap_save(interp_map, "map_interpolation.png")
+    
   })
   
   # Write the descriptive map
@@ -443,7 +448,10 @@ server <- function(input, output, session){
       tm_polygons() +
       tm_shape(df_reactive$points) +
       tm_dots() +
-      tm_layout(title= i18n$t("Kart over området"))
+      tm_compass()+
+      tm_scale_bar()+
+      tm_layout(title= i18n$t("Kart over området"),
+                legend.outside=T)
     tmap_save(d_map, "map_descriptive.png")
     
     })
