@@ -1,7 +1,7 @@
 <h1 align="center">CarbonViewer:four_leaf_clover: </h1>
 <h2 align="center">A calculator for peatland volume and carbon stock to support area planners and decision makers .</h2>
 
-![CC BY-NC-SA 4.0][license-badge]
+![MIT License][license-badge]
 [![DOI](https://zenodo.org/badge/554694482.svg)](https://zenodo.org/badge/latestdoi/554694482)
 
 [license-badge]: https://badgen.net/badge/License/CC-BY-NC-SA%204.0/green
