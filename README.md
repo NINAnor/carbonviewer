@@ -4,7 +4,7 @@
 ![MIT License][license-badge]
 [![DOI](https://zenodo.org/badge/554694482.svg)](https://zenodo.org/badge/latestdoi/554694482)
 
-[license-badge]: https://badgen.net/badge/License/CC-BY-NC-SA%204.0/green
+[license-badge]: https://badgen.net/badge/License/MIT
 
 **NOTE**: The application supports both the English and Norwegian language. To change the language, click on the `Change language` box and choose `en` for English or `no` for Norwegian. 
 
