@@ -28,7 +28,23 @@ Beskrivelse av appen på [Norsk](#hva-er-carbonviewer)
 
 **Etter å ha fulgt alle trinnene beskrevet nedenfor, klikk på fanen `Resultater` for å visualisere resultatene**
 
-- I menyen 'volumberegning' må brukeren laste opp en 'zip'-fil som inneholder både en 'shapefil' som avgrenser det aktuelle området og en 'csv'-fil med torvdybder (m), samt koordinater (gitt i UTM 32 N, EPSG:25832) for hvert prøvepunkt tatt i det aktuelle området. En eksempelfil for notering av torvdybder vises nedenfor. Torvdybder bør- for best mulig resultat - bli tatt med regelmessige intervaller med maksimum avstand på 20m mellom hvert punkt (for mindre myrarealer bør en avstand på mindre enn 20m benyttes).
+- I menyen 'volumberegning' må brukeren laste opp en 'zip'-fil som inneholder både en 'shapefil' som avgrenser det aktuelle området og en 'csv'-fil med torvdybder (m), samt koordinater (gitt i UTM 32 N, EPSG:25832) for hvert prøvepunkt tatt i det aktuelle området. En mål for notering av torvdybder vises nedenfor. Torvdybder bør- for best mulig resultat - bli tatt med regelmessige intervaller med maksimum avstand på 20m mellom hvert punkt (for mindre myrarealer bør en avstand på mindre enn 20m benyttes).
+
+**Riktig mål for .csv filen**
+
+<br>
+
+
+| X   &nbsp; &nbsp; &nbsp;    | Y    &nbsp; &nbsp; &nbsp;    |        Dybde |
+|---------|----------|--------------|
+|    X1   |	  Y1     |	        1.2  |
+|    X2    |	   Y2    |	      1.2  |
+|    X3    |	   Y3    |	      2.7  |
+|    X4     |	   Y4    |	      2.7  |
+|    X5    |	   Y5    |	      3.2  |
+
+
+<br>
 
 - Brukeren kan deretter klikke på `Last in datasett`. Etter noen sekunder vil applikasjonen interpolere dybdene til hele interesseområdet. et kart over det gitte området med svarte punkter som indikerer hvor torvdybden er målt, og et kart over de interpolerte torvdybdene skal vises. **Merk** at en fremdriftslinje vises nederst til høyre i applikasjonen.
 
@@ -69,7 +85,30 @@ The application estimates the total carbon content in the peat body, which can b
 
 **After following all the steps described below, please click on the `Results` tab to vizualise the results**
 
-- In the menu 'Volume calculation' the user must upload a `zip` file containing both a `shapefile` with the extent of the area of interest and a `csv` file containing peat depth measures (in m) taken at the site with coordinates for each measure (given in UTM 32 N, EPSG:25832). An example file for notation of peat depths is provided below. Peat depth measurements should -for best results- be taken at regular intervals at a maximum distance of 20m between each sample point (if a small peatland area are sampled, less than 20m is needed).
+- In the menu 'Volume calculation' the user must upload a `zip` file containing both a `shapefile` with the extent of the area of interest and a `csv` file containing peat depth measures (in m) taken at the site with coordinates for each measure (given in UTM 32 N, EPSG:25832). An example template for notation of peat depths is provided below. Peat depth measurements should -for best results- be taken at regular intervals at a maximum distance of 20m between each sample point (if a small peatland area are sampled, less than 20m is needed).
+
+**Example of correct format for the .csv file**
+
+
+<br>
+
+<br>
+
+
+| X   &nbsp; &nbsp; &nbsp;    | Y    &nbsp; &nbsp; &nbsp;    |        Dybde |
+|---------|----------|--------------|
+|    X1   |	  Y1     |	        1.2  |
+|    X2    |	   Y2    |	      1.2  |
+|    X3    |	   Y3    |	      2.7  |
+|    X4     |	   Y4    |	      2.7  |
+|    X5    |	   Y5    |	      3.2  |
+
+
+<br>
+
+<br>
+
+
 
 - The user can then click on `Load dataset`. After a few seconds the application will interpolate the depths of the entire area of interest. a map of the given area with black points indicating where peat depth have been measured, and a map of the interpolated peat depths should be displayed. **Note** that a progress bar is displayed on the bottom right of the application.
 
