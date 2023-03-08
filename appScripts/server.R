@@ -102,7 +102,8 @@ server <- function(input, output, session){
             shp <- shp %>% st_set_crs(25832)
             } 
           else {
-            print("The object has a CRS")
+            print("The object has a CRS -- Converting to 25832")
+            shp <- shp %>% st_transform(25832)
           }
           
           df <- open_csv(paste0(BASE, "/", csv_file)) 
