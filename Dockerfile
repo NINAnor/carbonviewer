@@ -16,10 +16,10 @@ RUN install2.r --error \
     plotly \
     dashboardthemes \
     starsExtra
-    
+
 RUN R -e "devtools::install_github('hadley/emo')"
 RUN R -e "devtools::install_github('Appsilon/shiny.i18n')"
-    
+
 COPY . ./home/rstudio/app/
 
 # Change the user settings

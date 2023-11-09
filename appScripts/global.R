@@ -179,8 +179,9 @@ print_error_csv_columns <- function(){
 
 open_shapefile <- function(filename){
   
-    shp <- readOGR(filename) %>% st_as_sf()
-    
+    #shp <- readOGR(filename) %>% st_as_sf()
+    shp <- st_read(filename)  
+  
     if (length(shp) == 0){
       showModal(modalDialog(
         title = "SHP input error",
