@@ -147,4 +147,4 @@ The application has been created by [Benjamin Cretois](https://www.nina.no/engli
 
 ### How to cite us:
 
-
+Kyrkjeeide, M. O., Fandrem, M., Kolstad, A. L., Bartlett, J., Cretois, B., & Silvennoinen, H. M. (2023). A calculator for local peatland volume and carbon stock to support area planners and decision makers. Carbon Management, 14(1), 2267018.
