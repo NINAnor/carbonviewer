@@ -72,14 +72,14 @@ server <- function(input, output, session){
       }
       
       n_files <- list.files(BASE, recursive = TRUE)
-      
+
       if (length(n_files) < 3){
         print_error_incompatible_file()
       }
       else{
-        shp_file <- list.files(BASE, pattern = '.shp', recursive = TRUE)
-        prj_file <- list.files(BASE, pattern = '.prj', recursive = TRUE)
-        csv_file <- list.files(BASE, pattern = '.csv', recursive = TRUE)
+        shp_file <- list.files(BASE, pattern = '.shp$', recursive = TRUE)
+        prj_file <- list.files(BASE, pattern = '.prj$', recursive = TRUE)
+        csv_file <- list.files(BASE, pattern = '.csv$', recursive = TRUE)
         
         # Check if there is both a shapefile and a CSV
         if (length(shp_file) == 0){
@@ -92,9 +92,7 @@ server <- function(input, output, session){
           print_no_csv()
         }
         else{
-          
           shp <- open_shapefile(paste0(BASE, "/", shp_file))
-                                
           # Check if the shapefile has a CRS / IF NOT WE ASSUME THAT THE CRS
           # IS 25832 AS SPECIFIED ON THE README
           if (is.na(st_crs(shp))) {
@@ -111,6 +109,7 @@ server <- function(input, output, session){
           
           # Check that the CSV contains the necessary columns (x,y, dybde)
           necessary_columns <- c("x","y","dybde")
+          print(sum(names(df) %in% necessary_columns) != 3)
           
           if (sum(names(df) %in% necessary_columns) != 3){
             print_error_csv_columns()
