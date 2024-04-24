@@ -2,7 +2,8 @@
 FROM rocker/geospatial
 
 RUN apt-get update -qq && \
-    apt-get install -qq libxt-dev r-cran-cairo
+    update-ca-certificates && \
+    apt-get install -qq libxt-dev r-base-dev r-cran-cairo 
 
 RUN install2.r --error \
     --deps TRUE \
@@ -27,6 +28,3 @@ RUN mkdir -p ./home/rstudio/.config/rstudio/
 RUN cp ./home/rstudio/app/rstudio-prefs.json ./home/rstudio/.config/rstudio/
 
 CMD Rscript ./home/rstudio/app/app.R
-
-
-

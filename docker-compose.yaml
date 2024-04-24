@@ -1,0 +1,18 @@
+version: '3'
+services:
+  rstudio:
+    image: carbonviewer-rstudio
+    ports:
+      - 8787:8787
+    volumes:
+      - ${PWD}/:/home/rstudio/app
+      - ${HOME}/Downloads:/home/willeke.acampo/Downloads
+    environment:
+      - DISABLE_AUTH=true
+
+  shiny:
+    image: carbonviewer-shiny
+    ports:
+      - 8999:8999
+    volumes:
+      - ${HOME}/Downloads:/home/willeke.acampo/Downloads
