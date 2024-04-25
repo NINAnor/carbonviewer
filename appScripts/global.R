@@ -9,13 +9,32 @@ compute_volume_slider <- function(peatDepths,
   myGrid <- starsExtra::make_grid(peatlandDelimination, 1)
   myGrid <- sf::st_crop(myGrid, peatlandDelimination)
   
-  vol <- gstat::idw(dybde ~ 1, peatDepths, 
+  vol <- gstat::idw(torvdybde_cm ~ 1, peatDepths, 
                              newdata=myGrid, 
                              nmax=30, 
                              idp=power)
 
   return(sum(vol$var1.pred, na.rm=T))
 }
+
+#' Interpolation of peat depths
+#'
+#' Interpolation of peat depths using Inverse Distance Weighting (IDW). 
+#' The optimal power value is determined by minimizing the Mean Absolute Error (MAE) 
+#' using cross-validation (IDW vs. kriging).
+#' 
+
+#' @param peatDepths peat depth points.
+#' @param peatlandDelimination study area polygon.
+#' @param powerRange range of power values: Default = 1:6.
+#' @param nmax max number of points to use in IDW and kriging. Default = 30.
+#'
+#' @return A list containing the following elements:
+#' - v: volume of peat in the study area.
+#' - idweights: A Spatial object containing the interpolated values.
+#' - best: The best power value.
+#' - gg_out: ggplot showing MAE against power.
+#' - gg_out_vol: A ggplot showing relative volume against power.
 
 interpolation <- function(peatDepths,
                           peatlandDelimination,
@@ -36,15 +55,16 @@ interpolation <- function(peatDepths,
     for(i in powerRange){
 
       # Get the MAE
-      temp2 <- gstat::krige.cv(dybde ~ 1, peatDepths, set = list(idp=i), nmax = nmax)
+      temp2 <- gstat::krige.cv(torvdybde_cm ~ 1, peatDepths, set = list(idp=i), nmax = nmax)
       temp$MAE[temp$power==i] <- mean(abs(temp2$residual))
       
       #  Get the volume
-      vol_temp <- gstat::idw(dybde ~ 1, peatDepths, 
+      vol_temp <- gstat::idw(torvdybde_cm ~ 1, peatDepths, 
                              newdata=myGrid, 
                              nmax=nmax, 
                              idp=i)
       
+      # vol in m3
       vol <- c(vol, sum(vol_temp$var1.pred, na.rm=T))
       
       Sys.sleep(0.5)
@@ -60,7 +80,7 @@ interpolation <- function(peatDepths,
   best <- temp %>% filter(best == "best")
   best <- best$power
   
-  
+
   ###############
   # Plot volume #
   ###############
@@ -69,8 +89,9 @@ interpolation <- function(peatDepths,
   vol_df$relative_volume <- vol_df$volume/mean(vol_df$volume)*100
   v <- vol_df %>% filter(power == best)
   v <- v$volume
-    
-  idweights <- gstat::idw(formula = dybde ~ 1, 
+  v_m3 <- v/100  
+  
+  idweights <- gstat::idw(formula = torvdybde_cm ~ 1, 
              locations = peatDepths, 
              newdata = myGrid, 
              idp=best,
@@ -81,25 +102,30 @@ interpolation <- function(peatDepths,
   ######################
   # Plot MAE vs power
   gg_out <- ggplot(temp, aes(x = power, y = MAE,
-                             colour = best,
-                             shape = best))+
-    geom_point(size=10)+
-    theme_bw(base_size = 12)+
+                            colour = best,
+                            shape = best))+
+    geom_point(size=6)+
+    theme_bw(base_size = 14)+
     scale_x_continuous(breaks = powerRange)+
     guides(colour="none",
-           shape = "none")+
+          shape = "none")+
     scale_color_manual(values = c("darkgreen","grey"))+
-    scale_shape_manual(values = c(18, 19))
-  
+    scale_shape_manual(values = c(18, 19))+
+    labs(title = "Comparison of Mean Absolute Error (MAE) for Different Power Values in IDW",
+        subtitle = "The optimal power value is visualized by the green diamond.",
+        x = "Power",
+        y = "Mean Absolute Error (MAE)")
+
   # Plot relative volume vs power
   gg_out_vol <- ggplot(vol_df, aes(x = factor(power), y = relative_volume))+
-    geom_point(size=8)+
-    xlab("power")+
-    ylab("Peat volume as a percentage of\nmean predicted peat volume")+
-    theme_bw(base_size = 12)
+    geom_point(size=6)+
+    theme_bw(base_size = 14)+
+    labs(title = "Impact of Power Parameter on Estimated Peat Volume",
+       x = "Power",
+       y = "Peat volume as a percentage of\nmean predicted peat volume")
 
   # Return the interpolation and the result volume
-  l_results <- list(v, idweights, best, gg_out, gg_out_vol)
+  l_results <- list(v_m3, idweights, best, gg_out, gg_out_vol)
   return(l_results)
 }
 
@@ -159,7 +185,7 @@ print_error_incompatible_file <- function(){
     "Please upload a dataset before clicking on 'load dataset'. 
           The dataset should be a zip file containing both a shapefile with the 
           extent of the area of interest and a csv file containing peat depth measures 
-          (in m) taken at the site with coordinates for each measure (given in UTM 32 N, EPSG:25832). 
+          (in m) taken at the site with coordinates for each measure (given in UTM 33 N, EPSG:25833). 
           For more information refer to the README.",
     easyClose = TRUE
   ))
@@ -169,7 +195,7 @@ print_error_csv_columns <- function(){
   showModal(modalDialog(
     title = "CSV input error",
     "The CSV file uploaded is not formatted correctly. Please make sure that it contains at least 
-    the coordinates (x and y) and the depth of the sampled sites (dybde). In any doubts, refer to the README.",
+    the coordinates (x and y) and the depth of the sampled sites (torvdybde_cm). In any doubts, refer to the README.",
     easyClose = TRUE
   ))
 }

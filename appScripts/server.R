@@ -14,7 +14,7 @@ server <- function(input, output, session){
   # LANGUAGE SETTINGS #
   #####################
   
-  # file with translations
+  # reactiveObserver: trigged by the language selection button
   observeEvent(input$selected_language, {
     shiny.i18n::update_lang(input$selected_language, session)
   })
@@ -22,34 +22,42 @@ server <- function(input, output, session){
   #######################
   # PREPARE THE DATASET #
   #######################
-  BASE=paste0("/home/rstudio/app", "/", session$token)
+
+  # A separate folder is created for each session
+  # to isolate user-specific data and computations
+  BASE=paste0("/home/rstudio/app", "/data/", session$token)
   dir.create(BASE)
-  
-  # State variable to know whether a folder has been uploaded
+  print(BASE)
+  # Dataframe that stores values based on user input in the app (reactiveValues)
+  # Default values are set to 0
   df_reactive <- reactiveValues()
   df_reactive$c_stock_mean <- 0
   df_reactive$c_stock_sd <- 0
   
+  # State variable to know whether a folder has been uploaded
   values <- reactiveValues(
     upload_state = NULL
   )
   
+  # reactiveObserver: trigged by uploading a file
   observeEvent(input$unzip, {
     values$upload_state <- 'uploaded'
   })
   
+  # reactiveObserver: trigged by pressing the reset button
   observeEvent(input$reset, {
     values$upload_state <- 'reset'
   })
   
+  # reactiveObserver: trigged by pressing the test app with testdata button
   observeEvent(input$test, {
     
     values$upload_state <- 'test'
   })
   
   # ! PRIMARY PART !
-  # Unzip the file and return the dataframe used for the calculations
-  # and the plots
+  # Unzip the file into the unique session folder
+  # and return the df_reactive used for the calculations and plots
   observeEvent(values$upload_state, {
 
     # Default upload_state value
@@ -60,8 +68,9 @@ server <- function(input, output, session){
     # If a file has been uploaded
     else if (values$upload_state == 'uploaded' || values$upload_state == 'test') {
     
+      print(paste("Upload state:", values$upload_state))
       if (values$upload_state == 'test'){
-        unzip ("/home/rstudio/app/test_dataset.zip", exdir = file.path(BASE))
+        unzip ("/home/rstudio/app/test/test_dataset_cm.zip", exdir = file.path(BASE))
       }
         # unzip the file
       else if (values$upload_state == 'uploaded'){
@@ -93,31 +102,45 @@ server <- function(input, output, session){
         }
         else{
           shp <- open_shapefile(paste0(BASE, "/", shp_file))
+
+          input_crs = st_crs(shp)
+          target_crs = 25833
           # Check if the shapefile has a CRS / IF NOT WE ASSUME THAT THE CRS
-          # IS 25832 AS SPECIFIED ON THE README
+          # IS 25833 AS SPECIFIED ON THE README
           if (is.na(st_crs(shp))) {
-            print("The object does not have a CRS, assigning a CRS")
-            shp <- shp %>% st_set_crs(25832)
+            print("The shapefile does not contain a projection (CRS)--> assigning the default CRS 'EPSG:25833'")
+            shp <- shp %>% st_set_crs(target_crs)
             } 
           else {
-            print("The object has a CRS -- Converting to 25832")
-            shp <- shp %>% st_transform(25832)
+            print("The shapefile has a projection (CRS) --> Converting to 'EPSG:25833'")
+            shp <- shp %>% st_transform(target_crs)
           }
           
           df <- open_csv(paste0(BASE, "/", csv_file)) 
           names(df) <- tolower(names(df))
+
+          # If name is peat_depth_cm change to torvdybde_cm
+          if ("peat_depth_cm" %in% names(df)){
+            names(df)[names(df) == "peat_depth_cm"] <- "torvdybde_cm"
+          }
           
-          # Check that the CSV contains the necessary columns (x,y, dybde)
-          necessary_columns <- c("x","y","dybde")
+          # Check that the CSV contains the necessary columns (x,y, torvdybde_cm)
+          necessary_columns <- c("x","y", "torvdybde_cm")
           print(sum(names(df) %in% necessary_columns) != 3)
+
+          # print first row of the dataframe
+          print(head(df))
           
           if (sum(names(df) %in% necessary_columns) != 3){
             print_error_csv_columns()
           }
           else{
-            dfs <- transform_to_sf(df) %>% st_set_crs(st_crs(shp))
-            dfs <- dfs %>% st_transform(25832)
-            shp <- shp %>% st_transform(25832)
+            dfs <- transform_to_sf(df) %>% st_set_crs(st_crs(input_crs))
+            dfs <- dfs %>% st_transform(target_crs)
+            shp <- shp %>% st_transform(target_crs)
+
+            #print(head(dfs))
+            print(head(shp))
             
             # Interpolation (take only "sp" objects, hence the conversion)
             interp <- interpolation(dfs, shp)
@@ -128,10 +151,17 @@ server <- function(input, output, session){
             df_reactive$volume <- interp[[1]]
             df_reactive$interpolation_raster <- interp[[2]]
             
+            # Fill the slider with the optimal power value
             updateSliderInput(session, "power", value=interp[[3]])
             
+            # Fill the plots with the MAE and volume
             df_reactive$maeVSpower <- interp[[4]]
             df_reactive$volumeVSpower <- interp[[5]]
+            
+            print("df_reactive:")
+            observe({
+              print(reactiveValuesToList(df_reactive))
+            })
           }
         }
       }
@@ -155,8 +185,9 @@ server <- function(input, output, session){
     v <- compute_volume_slider(df_reactive$points,
                           df_reactive$shape,
                           input$power)
+    v_m3 <- v/100
     
-    df_reactive$volume <- v
+    df_reactive$volume <- v_m3
     })
   
   # Overwrite the interpolation raster based on input$power
@@ -169,7 +200,7 @@ server <- function(input, output, session){
     myGrid <- starsExtra::make_grid(df_reactive$shape, 1)
     myGrid <- sf::st_crop(myGrid, df_reactive$shape)
     
-    idweights <- gstat::idw(formula = dybde ~ 1, 
+    idweights <- gstat::idw(formula = torvdybde_cm ~ 1, 
                             locations = df_reactive$points, 
                             newdata = myGrid, 
                             idp=input$power,
@@ -220,7 +251,7 @@ server <- function(input, output, session){
   df_reactive$gran_data <- reactive({
     req(input$s_peatland_type)
     
-    df_read <- fread("/home/rstudio/app/dataset.csv",
+    df_read <- fread("/home/rstudio/app/data/gran_dataset.csv",
                      sep = ";",
                      encoding = "unknown")
     
@@ -380,11 +411,10 @@ server <- function(input, output, session){
     leaflet() %>% addTiles() %>%
       addStarsImage(df_reactive$interpolation_raster, colors = pal) %>% 
       addLegend(pal = pal, values = values(idw_r),
-                title = i18n$t("Dybde")) %>% 
+                title = i18n$t("Torvdybde (cm)")) %>% 
       addControl(title, position = "topleft", className="map-title")
     
   })
-    
   
   ###################
   # OUTPUT THE MAPS #
@@ -430,15 +460,17 @@ server <- function(input, output, session){
   
   # Write the interpolation map
   shot_interp_map <- reactive({
-    
-    interp_map <- tm_shape(df_reactive$interpolation_raster) +
+    b1_peat_depth <- stars::st_as_stars(df_reactive$interpolation_raster[[1]])
+    st_crs(b1_peat_depth) <- 25833
+    print(b1_peat_depth)
+    interp_map <- tm_shape(b1_peat_depth) +
       tm_raster(title = i18n$t("Dybde")) +
       tm_compass() +
       tm_scale_bar() +
-      tm_layout(title= i18n$t("Kart med interpolerte torvdybder"),
+      tm_layout(title= i18n$t("Kart med interpolerte torvdybder (cm)"),
                 legend.outside=T)
     
-    tmap_save(interp_map, "map_interpolation.png")
+    tmap_save(interp_map, "kart_torvdybder.png")
     
   })
   
@@ -452,13 +484,13 @@ server <- function(input, output, session){
       tm_scale_bar()+
       tm_layout(title= i18n$t("Kart over området"),
                 legend.outside=T)
-    tmap_save(d_map, "map_descriptive.png")
+    tmap_save(d_map, "kart_over_omradet.png")
     
     })
   
   # Write the raster
   write_raster <- reactive({
-    write_stars(df_reactive$interpolation_raster, "interpolation_raster.tif")
+    write_stars(df_reactive$interpolation_raster, "raster_interpolerte_torvdybder.tif")
   })
   
   result_csv <- reactive({
@@ -476,14 +508,33 @@ server <- function(input, output, session){
       results <- rbind(results, area, c_stock_mean, c_stock_sd)
     }
 
-    write.csv(results, "results.csv")
+    write.csv(results, "carbonviewer_resultater.csv")
     
   })
     
+  result_txt <- reactive({
+    
+    results <- tibble(Description = "volume", Results = df_reactive$volume, units = "m3")
+    area <- tibble(Description = "area", Results = df_reactive$area, units = "m2")
+    
+    if (df_reactive$c_stock_mean == 0 && df_reactive$c_stock_sd == 0){
+      results <- rbind(results, area)
+    }
+    
+    else {
+      c_stock_mean <- tibble(Description = "carbon_stock_mean", Results = df_reactive$c_stock_mean, units = "Tons")
+      c_stock_sd <- tibble(Description = "carbon_stock_sd", Results = df_reactive$c_stock_sd, units = "Tons")
+      results <- rbind(results, area, c_stock_mean, c_stock_sd)
+    }
+
+    write.table(results, "carbonviewer_resultater.txt", quote = FALSE, sep = "\t", row.names = FALSE)
+    
+  }) 
+
   # Downloadable csv of selected dataset ----
   output$downloadData <- downloadHandler(
     
-    filename = function() {paste("results-", Sys.Date(), ".zip", sep="")},
+    filename = function() {paste(i18n$t("carbonviewer-resultater-"), Sys.Date(), ".zip", sep="")},
     
     content = function(file) {
       
@@ -492,9 +543,13 @@ server <- function(input, output, session){
       write_raster()
       shot_d_map()
       result_csv()
+      result_txt()
       
-      fs <- c("map_interpolation.png", "interpolation_raster.tif", "map_descriptive.png", "results.csv")
-      
+      fs <- c(i18n$t("kart_torvdybder.png"), 
+              i18n$t("raster_interpolerte_torvdybder.tif"), 
+              i18n$t("kart_over_omradet.png"), 
+              i18n$t("carbonviewer_resultater.csv"), 
+              i18n$t("carbonviewer_resultater.txt"))
       zip(zipfile = file, files = fs)
       contentType = "application/zip"
     }
