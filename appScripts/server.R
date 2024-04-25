@@ -464,13 +464,13 @@ server <- function(input, output, session){
     st_crs(b1_peat_depth) <- 25833
     print(b1_peat_depth)
     interp_map <- tm_shape(b1_peat_depth) +
-      tm_raster(title = i18n$t("Dybde")) +
+      tm_raster(title = i18n$t("Torvdybde (cm)")) +
       tm_compass() +
       tm_scale_bar() +
       tm_layout(title= i18n$t("Kart med interpolerte torvdybder (cm)"),
                 legend.outside=T)
     
-    tmap_save(interp_map, "kart_torvdybder.png")
+    tmap_save(interp_map, i18n$t("kart_torvdybder.png"))
     
   })
   
@@ -484,13 +484,13 @@ server <- function(input, output, session){
       tm_scale_bar()+
       tm_layout(title= i18n$t("Kart over området"),
                 legend.outside=T)
-    tmap_save(d_map, "kart_over_omradet.png")
+    tmap_save(d_map, i18n$t("kart_over_omradet.png"))
     
     })
   
   # Write the raster
   write_raster <- reactive({
-    write_stars(df_reactive$interpolation_raster, "raster_interpolerte_torvdybder.tif")
+    write_stars(df_reactive$interpolation_raster, i18n$t("raster_interpolerte_torvdybder.tif"))
   })
   
   result_csv <- reactive({
@@ -508,7 +508,7 @@ server <- function(input, output, session){
       results <- rbind(results, area, c_stock_mean, c_stock_sd)
     }
 
-    write.csv(results, "carbonviewer_resultater.csv")
+    write.csv(results, i18n$t("carbonviewer_resultater.csv"))
     
   })
     
@@ -527,7 +527,7 @@ server <- function(input, output, session){
       results <- rbind(results, area, c_stock_mean, c_stock_sd)
     }
 
-    write.table(results, "carbonviewer_resultater.txt", quote = FALSE, sep = "\t", row.names = FALSE)
+    write.table(results, i18n$t("carbonviewer_resultater.txt"), quote = FALSE, sep = "\t", row.names = FALSE)
     
   }) 
 

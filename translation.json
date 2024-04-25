@@ -4,14 +4,19 @@
   "translation": [
       {"no": "Volumberegning","en": "Volume calculation"},
       {"no": "Last opp en zip-fil", "en": "Upload a zip file"},
-      {"no": "Last inn datasett", "en": "Load dataset"},
+	  {"no": "Last opp data", "en": "Upload data"},
+	  {"no": "Søk", "en": "Ingen fil er valgt"},
+	  {"no": "Beregn", "en": "Calculate"},
+	  {"no": "Beregn med testdata", "en": "Calculate with test data"},
+	  {"no": "Beregn karboninnhold", "en": "Carbon content calculation"},
+	  {"no": "Beregn volume", "en": "Volume calculation"},
+	  {"no": "torvdybde_cm", "en": "peat_depth_cm"},
 	    {"no": "Skift språk", "en": "Change language"},
-	    {"no": "Resultater", "en": "Results"},
+	    {"no": "Kart resultater", "en": "Map results"},
 	    {"no": "Om oss", "en": "ABOUT"},
 	    {"no": "Last ned resultater", "en": "Download results"},
 	    {"no": "Areal", "en": "Area"},
 	    {"no": "Volum", "en": "Volume"},
-	    {"no": "Beregn volum", "en": "Calculate volume"},
 	    {"no": "Torvegenskaper", "en": "Peat properties"},
 	    {"no": "Standardverdier", "en": "Default values"},
 	    {"no": "Egendefinerte verdier", "en": "Custom values"},
@@ -25,16 +30,25 @@
 	    {"no": "Hovedmyrtype", "en": "General peatland type"},
 	    {"no": "Myrtype", "en": "Specific peatland type"},
 	    {"no": "Kart over området", "en": "Map of the area"},
-	    {"no": "Kart med interpolerte torvdybder", "en": "Map of interpolated peat depths"},
-	    {"no": "Dybde", "en": "Depth"},
+	    {"no": "Kart med interpolerte torvdybder (cm)", "en": "Map of interpolated peat depths (cm)"},
+	    {"no": "Torvdybde (cm)", "en": "Peat depth (cm)"},
 	    {"no": "Bruksanvisning", "en": "Instructions"},
+		{"no": "carbonviewer-resultater-", "en": "carbonviewer-results-"},
+		{"no":"kart_torvdybder.png", "en": "map_peat_depths.png"},
+		{"no": "raster_interpolerte_torvdybder.tif", "en": "raster_interpolated_peat_depths.tif"},
+      {"no": "kart_over_omradet.png", "en": "map_study_area.png"},
+	  {"no": "carbonviewer_resultater.csv" , "en": "carbonviewer_results.csv"},
+      {"no": "carbonviewer_resultater.txt", "en": "carbonviewer_results.txt"},
       {"no": "Last verdier", "en": "Load values"},
       {"no": "Nullstille", "en": "Reset"},
-      {"no": "Valg av power", "en": "Power setting"},
+      {"no": "Power evalueringsgrafer", "en": "Power evaluation graphs"},
       {"no": "Power verdi", "en": "Power value"},
       {"no": "Tonn", "en": "Tons"},
-      {"no": "Prøv app med testdatasett", "en": "Try app with test dataset"},
       {"no": "Kraftparameteren er satt til sin optimale verdi og brukes til å beregne både volumet av torv og mengden karbon som finnes i området. Likevel er det mulig å endre den for å passe bedre ens formål.", 
       "en": "The power parameter is set at its optimal value and is used to compute both the volume of peat and the amount of carbon contained in the area. Nevertheless, it is possible to change it to better fit one's purpose."}
     ]
 }
+
+
+
+
