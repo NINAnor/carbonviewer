@@ -1,3 +1,5 @@
+### Project Structure
+
 ```
 \carbonviewer
 ├── .github
@@ -40,4 +42,15 @@
 ├── rstudio-prefs.json      # Rstudio preferences
 ├── translation.json        # Language translation dictionairy for the app read into 
 ```
+
+
+
+### Development in Rstudio with docker:
+- Comment last line out in the Dockerfile `CMD Rscript ./home/rstudio/app/app.R`
+- Build the docker image: `docker compose build`
+- Run the docker container: `docker compose up`
+- Open the Rstudio in a browser: `localhost:8787`
+- Set working directory to app dir: `setwd(/home/rstudio/app)`
+- Make changes, save and run the app in the Rstudio terminal: `shiny::runApp()`
+
 

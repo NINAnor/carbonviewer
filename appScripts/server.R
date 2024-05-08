@@ -18,6 +18,20 @@ server <- function(input, output, session){
   observeEvent(input$selected_language, {
     shiny.i18n::update_lang(input$selected_language, session)
   })
+
+  # if language is no select instructions_no.md otherwise instructions_en.md
+  output$instructions <- renderUI({
+    req(input$selected_language)
+    if (input$selected_language == "no"){
+      includeMarkdown("/home/rstudio/app/docs/instructions_no.md")
+    }
+    else{
+      includeMarkdown("/home/rstudio/app/docs/instructions_en.md")
+    }
+  })  
+
+
+
   
   #######################
   # PREPARE THE DATASET #

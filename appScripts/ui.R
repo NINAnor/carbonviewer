@@ -104,7 +104,7 @@ body <- shinydashboard::dashboardBody(
     tabItem(
       tabName = "instruction",
       fluidRow(
-        box(includeMarkdown("/home/rstudio/app/instructions.md"), width = 10)
+        box(uiOutput("instructions"), width = 10)
       )
     ),
     
