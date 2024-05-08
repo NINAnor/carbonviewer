@@ -200,6 +200,14 @@ print_error_csv_columns <- function(){
   ))
 }
 
+print_corrupt_shp <- function(){
+  showModal(modalDialog(
+    title = "SHP input error",
+    "The SHP file uploaded is corrupt. Please make sure that it contains the polygon(s) of the area of interest. 
+          In any doubts, refer to the README. The session is reloaded.",
+    easyClose = TRUE
+  ))
+}
 
 # Error message if files are not opened properly
 

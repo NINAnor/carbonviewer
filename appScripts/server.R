@@ -95,92 +95,100 @@ server <- function(input, output, session){
       }
       
       n_files <- list.files(BASE, recursive = TRUE)
+      print(n_files)
 
-      if (length(n_files) < 3){
-        print_error_incompatible_file()
+
+      shp_file <- list.files(BASE, pattern = '.shp$', recursive = TRUE)
+      prj_file <- list.files(BASE, pattern = '.prj$', recursive = TRUE)
+      csv_file <- list.files(BASE, pattern = '.csv$', recursive = TRUE)
+        
+      # Check if there is both a shapefile and a CSV
+      if (length(shp_file) == 0){
+        print_no_shp()
+      }
+      else if (length(prj_file) == 0){
+        print_no_prj()
+        }
+      else if (length(csv_file) == 0){
+        print_no_csv()
       }
       else{
-        shp_file <- list.files(BASE, pattern = '.shp$', recursive = TRUE)
-        prj_file <- list.files(BASE, pattern = '.prj$', recursive = TRUE)
-        csv_file <- list.files(BASE, pattern = '.csv$', recursive = TRUE)
+
+        tryCatch({
+          shp <- st_read(paste0(BASE, "/", shp_file))
+        }, error = function(e){
+          print_corrupt_shp()
+          # sleep for 15 sec and reload session
+          Sys.sleep(15)
+          session$reload()
+        })
+        #shp <- open_shapefile(paste0(BASE, "/", shp_file))
+
+
+
+        input_crs = st_crs(shp)
+        target_crs = 25833
+        # Check if the shapefile has a CRS / IF NOT WE ASSUME THAT THE CRS
+        # IS 25833 AS SPECIFIED ON THE README
+        if (is.na(st_crs(shp))) {
+          print("The shapefile does not contain a projection (CRS)--> assigning the default CRS 'EPSG:25833'")
+          shp <- shp %>% st_set_crs(target_crs)
+          } 
+        else {
+          print("The shapefile has a projection (CRS) --> Converting to 'EPSG:25833'")
+          shp <- shp %>% st_transform(target_crs)
+        }
         
-        # Check if there is both a shapefile and a CSV
-        if (length(shp_file) == 0){
-          print_no_shp()
+        df <- open_csv(paste0(BASE, "/", csv_file)) 
+        names(df) <- tolower(names(df))
+
+        # If name is peat_depth_cm change to torvdybde_cm
+        if ("peat_depth_cm" %in% names(df)){
+          names(df)[names(df) == "peat_depth_cm"] <- "torvdybde_cm"
         }
-        else if (length(prj_file) == 0){
-          print_no_prj()
-        }
-        else if (length(csv_file) == 0){
-          print_no_csv()
+        
+        # Check that the CSV contains the necessary columns (x,y, torvdybde_cm)
+        necessary_columns <- c("x","y", "torvdybde_cm")
+        print(sum(names(df) %in% necessary_columns) != 3)
+
+        # print first row of the dataframe
+        print(head(df))
+        
+        if (sum(names(df) %in% necessary_columns) != 3){
+          print_error_csv_columns()
         }
         else{
-          shp <- open_shapefile(paste0(BASE, "/", shp_file))
+          dfs <- transform_to_sf(df) %>% st_set_crs(st_crs(input_crs))
+          dfs <- dfs %>% st_transform(target_crs)
+          shp <- shp %>% st_transform(target_crs)
 
-          input_crs = st_crs(shp)
-          target_crs = 25833
-          # Check if the shapefile has a CRS / IF NOT WE ASSUME THAT THE CRS
-          # IS 25833 AS SPECIFIED ON THE README
-          if (is.na(st_crs(shp))) {
-            print("The shapefile does not contain a projection (CRS)--> assigning the default CRS 'EPSG:25833'")
-            shp <- shp %>% st_set_crs(target_crs)
-            } 
-          else {
-            print("The shapefile has a projection (CRS) --> Converting to 'EPSG:25833'")
-            shp <- shp %>% st_transform(target_crs)
-          }
+          #print(head(dfs))
+          print(head(shp))
           
-          df <- open_csv(paste0(BASE, "/", csv_file)) 
-          names(df) <- tolower(names(df))
-
-          # If name is peat_depth_cm change to torvdybde_cm
-          if ("peat_depth_cm" %in% names(df)){
-            names(df)[names(df) == "peat_depth_cm"] <- "torvdybde_cm"
-          }
+          # Interpolation (take only "sp" objects, hence the conversion)
+          interp <- interpolation(dfs, shp)
           
-          # Check that the CSV contains the necessary columns (x,y, torvdybde_cm)
-          necessary_columns <- c("x","y", "torvdybde_cm")
-          print(sum(names(df) %in% necessary_columns) != 3)
-
-          # print first row of the dataframe
-          print(head(df))
+          # Fill the DF reactive
+          df_reactive$shape <- shp
+          df_reactive$points <- dfs
+          df_reactive$volume <- interp[[1]]
+          df_reactive$interpolation_raster <- interp[[2]]
           
-          if (sum(names(df) %in% necessary_columns) != 3){
-            print_error_csv_columns()
-          }
-          else{
-            dfs <- transform_to_sf(df) %>% st_set_crs(st_crs(input_crs))
-            dfs <- dfs %>% st_transform(target_crs)
-            shp <- shp %>% st_transform(target_crs)
-
-            #print(head(dfs))
-            print(head(shp))
-            
-            # Interpolation (take only "sp" objects, hence the conversion)
-            interp <- interpolation(dfs, shp)
-            
-            # Fill the DF reactive
-            df_reactive$shape <- shp
-            df_reactive$points <- dfs
-            df_reactive$volume <- interp[[1]]
-            df_reactive$interpolation_raster <- interp[[2]]
-            
-            # Fill the slider with the optimal power value
-            updateSliderInput(session, "power", value=interp[[3]])
-            
-            # Fill the plots with the MAE and volume
-            df_reactive$maeVSpower <- interp[[4]]
-            df_reactive$volumeVSpower <- interp[[5]]
-            
-            print("df_reactive:")
-            observe({
-              print(reactiveValuesToList(df_reactive))
-            })
-          }
+          # Fill the slider with the optimal power value
+          updateSliderInput(session, "power", value=interp[[3]])
+          
+          # Fill the plots with the MAE and volume
+          df_reactive$maeVSpower <- interp[[4]]
+          df_reactive$volumeVSpower <- interp[[5]]
+          
+          print("df_reactive:")
+          observe({
+            print(reactiveValuesToList(df_reactive))
+          })
         }
       }
     }
-    
+      
     # If the reset button has been pushed
     else if (values$upload_state == 'reset') {
       session$reload()
