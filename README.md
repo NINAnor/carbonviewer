@@ -120,9 +120,9 @@ The peat volume of the study area is calculated by the interpolation of the peat
 
 The application has been created by [Benjamin Cretois](https://www.nina.no/english/Contact/Employees/Employee-info?AnsattID=15849), [Marte Fandrem](https://www.ntnu.no/ansatte/marte.fandrem) and [Magni Olsen Kyrkjeeide](https://www.nina.no/Kontakt/Ansatte/Ansattinformasjon.aspx?AnsattID=12110). This project was funded by Norwegian Research Council under Grant number 282327 and Statnett.
 
-<img src="../man/figures/logo_nina.png" alt="drawing" width="100"/>
-<img src="../man/figures/ntnu.png" alt="drawing" width="100"/>
-<img src="../man/figures/statnett.png" alt="drawing" width="100"/>
+<img src="man/figures/logo_nina.png" alt="drawing" width="100"/>
+<img src="man/figures/ntnu.png" alt="drawing" width="100"/>
+<img src="man/figures/statnett.png" alt="drawing" width="100"/>
 
 
 ### How to cite us:
