@@ -10,44 +10,41 @@
 
 ---
 
-## What is the CarbonViewer?
+## What is CarbonViewer?
 
-**CarbonViewer** is a [R Shiny](https://shiny.rstudio.com/) application designed to calculate and visualize the amount of carbon stored in a given peatland area. 
-The application estimates the total carbon content in the peat body, which can be used to evaluate the soil carbon storage at any given peatland site and the potential impact land-use change can have on CO2 emission. As development in peatland areas may give cause to high greenhouse gas emissions, the aim of this application is to support area planners with an improved knowledge base of the soil carbon in potentially impacted areas. The application should be applied during early planning phases as a tool to map soil carbon stocks in peatlands, to avoid, reduce or mitigate the impact of development in peatlands areas.
+**CarbonViewer** is a [R Shiny](https://shiny.rstudio.com/) application designed to calculate and visualize the amount of carbon stored in a given peatland area. The application estimates the total carbon content in the peat body, which can be used to evaluate the soil carbon storage at any given peatland site and the potential impact land-use change can have on CO2 emission. As drainage of peatland areas results in high greenhouse gas emissions, the aim of this application is to support area planners with an improved knowledge base of the soil carbon stock in peatlands considered for development. The application should be used early in planning as a tool to map soil carbon stocks in peatlands, and hence, to avoid, reduce or mitigate the impact of development in peatlands areas.
 
-## How to use the CarbonViewer?
+## How to use CarbonViewer?
 
 
 ### 1. Import Data
 
-Upload a zip-file containing a shapefile of the study area and a csv-file with peat depth measurements in cm. Ensure that the X and Y coordinates in the csv-file match the coordinate system of the shapefile. All coordinate systems are supported, but note that the application converts the data to ETRS89 UTM Zone 33N for the calculations.
+Upload a zip-file containing a shapefile of the study area and a csv-file with peat depth measurements in cm from the same area. Ensure that the X and Y coordinates of the peat depths measurements in the csv-file match the coordinate system of the shapefile. All coordinate systems are supported, but note that the application converts the data to ETRS89 UTM Zone 33N for the calculations.
+
+***User Action:** Click on Upload Data. Drag and drop or browse for the zip-file containing the shapefile and csv-file.* 
+- *The shapefile must include the following files: .shp, .shx, .dbf, and .prj.* 
+- *The csv-file must include the following columns: X, Y, and peat_depth_cm.*
 
 **Folder structure:**
 
-| | |
-| --- | --- |
-| └── study_area.zip | |
-| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;├── study_area.shp | |
-| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;├── study_area.shx | |
-| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;├── study_area.dbf | |
-| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;├── study_area.prj | |
-| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;└── peat_depth_measurements.csv | |
+```{text}
+/dataset.zip
+├── peat_depth_samples.csv              
+├── study_area.dbf              
+├── study_area.prj
+├── study_area.shp
+└── study_area.shx
+```
 
-<br>
 
-**Example of the .csv file:**
-
-| &nbsp; &nbsp; X &nbsp; &nbsp; | &nbsp; &nbsp; Y &nbsp; &nbsp; | peat_depth_cm |
-|:-----------------------------:|:-----------------------------:|:-------------:|
-|              X1               |              Y1               |      120      |
-|              X2               |              Y2               |      120      |   
-|              X3               |              Y3               |      270      |
-|              X4               |              Y4               |      270      |
-|              X5               |              Y5               |      320      |
-
-<br>
-
-***User Action:** Click on Upload Data. Drag and drop or browse for the zip-file containing the shapefile and csv-file. The shapefile must include the following files: .shp, .shx, .dbf, and .prj. The csv-file must include the following columns: X, Y, and peat_depth_cm.*
+**Example of correct format for the .csv file:**
+| X &nbsp; &nbsp; &nbsp;| Y &nbsp; &nbsp; &nbsp;| peat_depth_cm |
+|-----------------------|-----------------------|---------------|
+| X1                    | Y1                    | 120           |
+| X2                    | Y2                    | 120           |
+| X3                    | Y3                    | 270           |
+| X4                    | Y4                    | 270           |
+| X5                    | Y5                    | 320           |
 
 ### 2. Calculate Peat Volume
 
@@ -63,9 +60,9 @@ This step results in:
 
 ### 3. Calculate the Carbon Content 
 
-The **Total Carbon Content** is calculated by multiplying the Soil Organic Carbon (SOC) with the total volume of peat in the study area. The SOC is calculated using the peat properties Bulk Density (BD), Soil Organic Matter (SOM), and the Carbon content fraction (see [Carbon Content Caluclation](#carbon-content-calculation)). The application allows the user to either choose **default** values for the peat properties or **customize** the values. The **default** values are based on a [Database](https://github.com/NINAnor/carbonviewer/blob/main/data/gran_dataset.csv) of peat properties from Norwegian mires, and a set value of 0.5 for the fraction of carbon content in organic matter. If the user chooses to **customize** the values, it is required to know the values of bulk density (in g/cm3 or tonne/m3, commonly less than 0.2 for peatlands), organic matter fraction and carbon content fraction for the study area. 
+The **Total Carbon Content** is calculated by multiplying the Soil Organic Carbon (SOC) with the total volume of peat in the study area. The SOC is calculated using the peat properties Bulk Density (BD), Soil Organic Matter (SOM), and the Carbon content fraction (see [Carbon Content Caluclation](#carbon-content-calculation)). The application allows the user to either choose **default** values for the peat properties or **customize** the values. The **default** values are based on a [Database](https://github.com/NINAnor/carbonviewer/blob/main/data/gran_dataset.csv) of peat properties from Norwegian mires, and a set value of 0.5 for the fraction of carbon content in organic matter. If the user chooses to **customize** the values, it is required to know the values of bulk density (in g/cm3 or tonne/m3, commonly less than 0.2 for peatlands), organic matter fraction (SOM) and carbon content fraction for the study area (typically 0.5).  
 
-This step results in a value for the **mean** and **standard deviation** of the total carbon content in the study area *(tonns C)* displayed in the Map results tab.
+This step results in a value for the **mean** and **standard deviation** of the total carbon content in the study area *(tons C)* displayed in the Map results tab.
 
 ***User Action:** Click on Carbon content calculation. Choose between Default values or Custom values for the peat properties. Click on Load values. View the results in the Map results tab.* 
 
@@ -78,16 +75,14 @@ The results of the volume and carbon calculations can be exported as a zip-file.
 
 The zip-file contains the following files:
 
-| | |
-| --- | --- |
-| └── carbonviewer-results-date.zip | |
-| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;├── carbonviewer_results.csv | &nbsp; &nbsp; &nbsp; &nbsp; *a csv-file with results from the volume and carbon calculations.* |
-| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;├── carbonviewer_results.txt| &nbsp; &nbsp; &nbsp; &nbsp; *a txt-file with results from the volume and carbon calculations.*|
-| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;├── map_study_area.png | &nbsp; &nbsp; &nbsp; &nbsp; *a map of the given area including peat depth measurement points.* |
-| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;├── map_peat_depths.png | &nbsp; &nbsp; &nbsp; &nbsp; *a map with interpolated values of peat depths.* |
-| &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;└── raster_interpolated_peat_depths.tif | &nbsp; &nbsp; &nbsp; &nbsp; *a raster with interpolated values of peat depths.*|
-
-<br>
+```{text}
+/Downloads/carbonviewer-results-date.zip
+├── carbonviewer_results.csv              
+├── carbonviewer_results.txt
+├── map_study_area.png
+├── map_peat_depths.png
+└── raster_interpolated_peat_depths.tif
+```
 
 ***User Action:** Click on Download results > Download.*
 
@@ -117,7 +112,7 @@ where:
 - **SOM** = Soil Organic Matter fraction
 - **0.5** = SOM:SOC conversion factor, value can range from 0 to 1, but the default value is set to 0.5
 
-The peat volume of the study area is calculated by the interpolation of the peat depth measurements (Step 2). The other peat properties, **Bulk Density**, **Soil Organic Mattter fraction**, and the SOM:SOC conversion factor, are either set to default values or can be customized by the user (Step 3). 
+The peat volume of the study area is calculated by the interpolation of the peat depth measurements (Step 2). The other peat properties, **Bulk Density**, **Soil Organic Matter fraction**, and the SOM:SOC conversion factor, are either set to default values or can be customized by the user (Step 3). 
 
 ---
 

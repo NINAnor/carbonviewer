@@ -40,10 +40,8 @@
 ├── LICENSE                 # License for the app
 ├── README.md               # Readme file for the app (exact same as instructions.md)
 ├── rstudio-prefs.json      # Rstudio preferences
-├── translation.json        # Language translation dictionairy for the app read into 
+├── translation.json        # Language translation dict 
 ```
-
-
 
 ### Development in Rstudio with docker:
 - Comment last line out in the Dockerfile `CMD Rscript ./home/rstudio/app/app.R`

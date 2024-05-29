@@ -77,7 +77,7 @@ sidebar <- shinydashboard::dashboardSidebar(
             )
     ),
     
-    menuItem(i18n$t("Kart resultater"), tabName = "tables", icon = icon("th")
+    menuItem(i18n$t("Kart og Resultater"), tabName = "tables", icon = icon("th")
              ),
     
     menuItem(i18n$t("Power evalueringsgrafer"), tabName = "powersetting", icon = icon('hand-fist')
