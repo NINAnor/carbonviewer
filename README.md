@@ -1,148 +1,128 @@
 <h1 align="center">CarbonViewer</h1>
-<h2 align="center">A calculator for peatland volume and carbon stock to support area planners and decision makers .</h2>
+<h2 align="center">A calculator for peatland volume and carbon stock to support area planners and decision makers.</h2>
 
-![MIT License][license-badge]
+![CC BY-NC-SA 4.0][license-badge]
 [![DOI](https://zenodo.org/badge/554694482.svg)](https://zenodo.org/badge/latestdoi/554694482)
 
-[license-badge]: https://badgen.net/badge/License/MIT
+[license-badge]: https://badgen.net/badge/License/CC-BY-NC-SA%204.0/green
 
 **NOTE**: The application supports both the English and Norwegian language. To change the language, click on the `Change language` box and choose `en` for English or `no` for Norwegian. 
 
-**MERK**: Applikasjonen støtter både engelsk og norsk. For å endre språk, klikk på `Endre språk`-boksen og velg `en` for engelsk eller `no` for norsk.
+---
 
-Description of CarbonViewer in [English](#what-is-the-carbonviewer)
+## What is CarbonViewer?
 
-Beskrivelse av appen på [Norsk](#hva-er-carbonviewer)
+**CarbonViewer** is a [R Shiny](https://shiny.rstudio.com/) application designed to calculate and visualize the amount of carbon stored in a given peatland area. The application estimates the total carbon content in the peat body, which can be used to evaluate the soil carbon storage at any given peatland site and the potential impact land-use change can have on CO2 emission. As drainage of peatland areas results in high greenhouse gas emissions, the aim of this application is to support area planners with an improved knowledge base of the soil carbon stock in peatlands considered for development. The application should be used early in planning as a tool to map soil carbon stocks in peatlands, and hence, to avoid, reduce or mitigate the impact of development in peatlands areas.
+
+## How to use CarbonViewer?
+
+
+### 1. Import Data
+
+Upload a zip-file containing a shapefile of the study area and a csv-file with peat depth measurements in cm from the same area. Ensure that the X and Y coordinates of the peat depths measurements in the csv-file match the coordinate system of the shapefile. All coordinate systems are supported, but note that the application converts the data to ETRS89 UTM Zone 33N for the calculations.
+
+***User Action:** Click on Upload Data. Drag and drop or browse for the zip-file containing the shapefile and csv-file.* 
+- *The shapefile must include the following files: .shp, .shx, .dbf, and .prj.* 
+- *The csv-file must include the following columns: X, Y, and peat_depth_cm.*
+
+**Folder structure:**
+
+```{text}
+/dataset.zip
+├── peat_depth_samples.csv              
+├── study_area.dbf              
+├── study_area.prj
+├── study_area.shp
+└── study_area.shx
+```
+
+
+**Example of correct format for the .csv file:**
+| X &nbsp; &nbsp; &nbsp;| Y &nbsp; &nbsp; &nbsp;| peat_depth_cm |
+|-----------------------|-----------------------|---------------|
+| X1                    | Y1                    | 120           |
+| X2                    | Y2                    | 120           |
+| X3                    | Y3                    | 270           |
+| X4                    | Y4                    | 270           |
+| X5                    | Y5                    | 320           |
+
+### 2. Calculate Peat Volume
+
+The total volume of peat in the study area is calculated by interpolating the peat depth measurements using Inverse Distance Weighting (IDW) (see [Peat Depth Interpolation](#peat-depth-interpolation)). **Note that a test dataset is provided to test the calculations: “Calculate with testdata”.**
+
+This step results in:
+- A map with points representing the location of the peat depth measurements in the field *(see Map results tab).*
+- A map displaying a raster (*1x1 m*) with the interpolated peat depths *(see Map results tab).*
+- A value for the study area (*m2*) and the total volume of peat (*m3*) in the study area *(see Map results tab).*
+- Graphs showing the influence of the power parameter on the interpolation results *(see Power evaluation graphs tab).*
+
+***User Action:** Click on Load dataset. Wait for the progress bar to finish. View the results in the Map results and Power evaluation graphs tabs. **Optional**: Customize the Power parameter in the Map Results tab.*
+
+### 3. Calculate the Carbon Content 
+
+The **Total Carbon Content** is calculated by multiplying the Soil Organic Carbon (SOC) with the total volume of peat in the study area. The SOC is calculated using the peat properties Bulk Density (BD), Soil Organic Matter (SOM), and the Carbon content fraction (see [Carbon Content Caluclation](#carbon-content-calculation)). The application allows the user to either choose **default** values for the peat properties or **customize** the values. The **default** values are based on a [Database](https://github.com/NINAnor/carbonviewer/blob/main/data/gran_dataset.csv) of peat properties from Norwegian mires, and a set value of 0.5 for the fraction of carbon content in organic matter. If the user chooses to **customize** the values, it is required to know the values of bulk density (in g/cm3 or tonne/m3, commonly less than 0.2 for peatlands), organic matter fraction (SOM) and carbon content fraction for the study area (typically 0.5).  
+
+This step results in a value for the **mean** and **standard deviation** of the total carbon content in the study area *(tons C)* displayed in the Map results tab.
+
+***User Action:** Click on Carbon content calculation. Choose between Default values or Custom values for the peat properties. Click on Load values. View the results in the Map results tab.* 
+
+- *Default values: Choose the peatland type of the area. Click on Load values.* 
+- *Custom values: Insert the values of Bulk Density (in g/cm3 or tonne/m3), Soil Organic Matter fraction (values of 0-1), and the fraction of carbon content in organic matter (values of 0-1) in the given area. Click on Load values.*
+
+### 4. Export Results
+
+The results of the volume and carbon calculations can be exported as a zip-file.
+
+The zip-file contains the following files:
+
+```{text}
+/Downloads/carbonviewer-results-date.zip
+├── carbonviewer_results.csv              
+├── carbonviewer_results.txt
+├── map_study_area.png
+├── map_peat_depths.png
+└── raster_interpolated_peat_depths.tif
+```
+
+***User Action:** Click on Download results > Download.*
 
 ---
 
-## Hva er CarbonViewer
+## Overview of Methods
 
-**CarbonViewer** er en [R Shiny](https://shiny.rstudio.com/)-applikasjon som beregner og visualiserer karbonmengde i torvlaget for et gitt areal av myr-naturtyper. Kalkulatoren estimerer det totale karboninnholdet bundet opp i organisk jord som kan frigjøres som atmosfærisk karbondioksid (CO2) dersom arealet blir påvirket. Utbygging i myr kan gi høye klimagassutslipp og formålet med kalkulatoren er å gi beslutningstakere et bedre kunnskapsgrunnlag om karbonet som er bundet opp i torv. Kalkulatoren bør brukes i tidlig planlegging og som et verktøy for å kartlegge jordbundet karbon i myr. Dette for å unngå utbygging i karbonrike områder og minimere klimagassutslipp fra naturinngrep.
+A brief overview of the methods used in the application is provided below. For a more detailed description, please refer to Kyrkjeeide, M. O. et al. (2023).
 
-## Hvordan bruker jeg denne applikasjonen?
+### Peat Depth Interpolation
+The peat depth measurements from field survey (*csv-file*) are extrapolated to the entire study area extent (*shp-file*) using Inverse Distance Weighting (IDW). IDW assumes that nearby observations are more alike than those further away. For instance, a peat measurement taken at a 10 *m* distance has a greater influence on the estimated value of a raster pixel cell than a measurement taken at a 50 *m* distance. The degree of this influence is controlled by the power parameter. A power of 1 assigns an equal weight to all points, resulting in a smoother interpolated raster. Increasing the power value reduces the influence of distant sample points on the estimated value. 
 
-**Merk at et testdatasett er gitt og det er mulig å laste det inn i applikasjonen ved å klikke på "Test app med testdatasett"**
+**Optimal value of the Power parameter:**
 
-### Lage kartene
+The application identifies the optimal power parameter using a cross-validation approach, comparing the results of an IDW interpolation method with those of a Kriging interpolation method. The power parameter is varied between 1 and 6, and the Mean Absolute Error (MAE) is calculated for each value. The power parameter with the lowest MAE is chosen as the default value. You can also choose to use a custom value for the power parameter by sliding the bar in the "Map Result" Section. The influence of the power on the results is shown in the graphs located in "Power Evaluation Graphs" section.
 
-**Etter å ha fulgt alle trinnene beskrevet nedenfor, klikk på fanen `Resultater` for å visualisere resultatene**
+### Carbon Content Calculation
 
-- I menyen 'volumberegning' må brukeren laste opp en 'zip'-fil som inneholder både en 'shapefil' som avgrenser det aktuelle området og en 'csv'-fil med torvdybder (m), samt koordinater (gitt i UTM 32 N, EPSG:25832) for hvert prøvepunkt tatt i det aktuelle området. En mål for notering av torvdybder vises nedenfor. Torvdybder bør- for best mulig resultat - bli tatt med regelmessige intervaller med maksimum avstand på 20m mellom hvert punkt (for mindre myrarealer bør en avstand på mindre enn 20m benyttes).
+The **Total Carbon Content (TCC)** of the study area is calculated by multiplying the SOC with the total volume of peat in the study area, where the SOC is calculated using the peat properties Bulk Density (BD), Soil Organic Matter (SOM), and the SOM:SOC conversion factor.
 
-**Riktig mål for .csv filen**
+TCC = SOC * v
 
-<br>
+where:
+- **SOC** = BD * SOM * 0.5
+- **v** = peat volume (m3) calculated by the interpolation of peat depth measurements
+- **BD** = dry Bulk Density (t m−3 or g cm−3)
+- **SOM** = Soil Organic Matter fraction
+- **0.5** = SOM:SOC conversion factor, value can range from 0 to 1, but the default value is set to 0.5
 
-
-| X   &nbsp; &nbsp; &nbsp;    | Y    &nbsp; &nbsp; &nbsp;    |        Dybde |
-|---------|----------|--------------|
-|    X1   |	  Y1     |	        1.2  |
-|    X2    |	   Y2    |	      1.2  |
-|    X3    |	   Y3    |	      2.7  |
-|    X4     |	   Y4    |	      2.7  |
-|    X5    |	   Y5    |	      3.2  |
-
-
-<br>
-
-- Brukeren kan deretter klikke på `Last in datasett`. Etter noen sekunder vil applikasjonen interpolere dybdene til hele interesseområdet. et kart over det gitte området med svarte punkter som indikerer hvor torvdybden er målt, og et kart over de interpolerte torvdybdene skal vises. **Merk** at en fremdriftslinje vises nederst til høyre i applikasjonen.
-
-- Etter at volumberegningen er utført, skal estimert totalvolum torv (m3) også vises på topppanelet.
-
-### Beregning av total karbonmengde i området
-
-Det siste trinnet beregner den totale karbonmengden i det aktuelle området. Brukeren kan legge inn egne data med torvegenskaper dersom dette er tilgjengelig. Alternativt velger brukeren å benytte data for karboninnhold fra en innebygd database. Når du klikker på `Torvegenskaper`, tilbys de to alternativene:
-
-- 1) `Standardverdier`: Når dette alternativet er valgt, trenger brukeren kun å velge myrtype for området. Her vil brukeren få flere alternative detaljnivåer for myrtype, gitt den kunnskapen som brukeren innehar om det angitte området. Beregningen av karbonmengden baseres på eksisterende data for **massetetthet**, og **andel organisk materiale** for oppgitt myrtype, samt standardverdi på 0.5 for **andel karboninnhold i organisk materiale** (se artikkel for kilder).
-
-- 2) `Egendefinerte verdier`: Dette alternativet forutsetter at brukeren kjenner verdiene for **massetetthet** (i g/cm3 eller tonn/m3, vanligvis mindre enn 0.2 for myr), **andel organisk materiale** (verdi 0-1) og **andel karboninnhold i organisk materiale** (verdi 0-1) i det aktuelle området eller ønsker å teste datasettet med egne inngangsverdier. Her er det mulig å legge inn egne tall. Når tallene er lagt inn, kan brukeren klikke på "Last inn verdier".
-
-Den totale karbonmengden (kg) i området vises øverst til høyre i applikasjonen.
-
-### Last ned dataene
-
-Når volumet er beregnet, er det mulig å laste ned kartfigurer. Videre vil resultater fra karbonberegningen bli tilgjengelig ved neste steg i kalkulatoren.
-I applikasjonen kan brukeren klikke på `Last ned resultater` og `Last ned`. Dette vil returnere en `.zip`-fil som inneholder:
-
-- `map_descriptive.png` : et kart over området med punkter for dybdemål.
-- `map_interpolation.png` : et kart med interpolerte torvdybder.
-- `interpolation_raster.tif` : et raster av resultatet fra volumberegningen - klar til bruk i enten **QGIS eller ArcGIS!**
-- `results.csv` : en csv-fil med resultater fra volum- og karbonberegningene.
+The peat volume of the study area is calculated by the interpolation of the peat depth measurements (Step 2). The other peat properties, **Bulk Density**, **Soil Organic Matter fraction**, and the SOM:SOC conversion factor, are either set to default values or can be customized by the user (Step 3). 
 
 ---
 
-## What is the CarbonViewer
-
-**CarbonViewer** is a [R Shiny](https://shiny.rstudio.com/) application designed to calculate and visualize the amount of carbon stored in a given peatland area. 
-The application estimates the total carbon content in the peat body, which can be used to evaluate the soil carbon storage at any given peatland site and the potential impact land-use change can have on CO2 emission. As development in peatland areas may give cause to high greenhouse gas emissions, the aim of this application is to support area planners with an improved knowledge base of the soil carbon in potentially impacted areas. The application should be applied during early planning phases as a tool to map soil carbon stocks in peatlands, to avoid, reduce or mitigate the impact of development in peatlands areas.
-
-## How to use this application?
-
-**Note that a test dataset is provided and that is is possible to load it in the application by clicking on "Test app with test dataset"**
-
-### Creating the maps
-
-**After following all the steps described below, please click on the `Results` tab to vizualise the results**
-
-- In the menu 'Volume calculation' the user must upload a `zip` file containing both a `shapefile` with the extent of the area of interest and a `csv` file containing peat depth measures (in m) taken at the site with coordinates for each measure (given in UTM 32 N, EPSG:25832). An example template for notation of peat depths is provided below. Peat depth measurements should -for best results- be taken at regular intervals at a maximum distance of 20m between each sample point (if a small peatland area are sampled, less than 20m is needed).
-
-**Example of correct format for the .csv file**
-
-
-<br>
-
-<br>
-
-
-| X   &nbsp; &nbsp; &nbsp;    | Y    &nbsp; &nbsp; &nbsp;    |        Dybde |
-|---------|----------|--------------|
-|    X1   |	  Y1     |	        1.2  |
-|    X2    |	   Y2    |	      1.2  |
-|    X3    |	   Y3    |	      2.7  |
-|    X4     |	   Y4    |	      2.7  |
-|    X5    |	   Y5    |	      3.2  |
-
-
-<br>
-
-<br>
-
-
-
-- The user can then click on `Load dataset`. After a few seconds the application will interpolate the depths of the entire area of interest. a map of the given area with black points indicating where peat depth have been measured, and a map of the interpolated peat depths should be displayed. **Note** that a progress bar is displayed on the bottom right of the application.
-
-- After the volume calculation is done the estimated total volume of peat (m3) should also appear on the top panel.
-
-### Calculating the carbon content of the area
-
-The final step lies in calculating the carbon content of the given area. When clicking on `Peat properties`, two options are offered to the user:
-
-- 1) `Default values`: Using this option, the user choose the peatland type of the area. The calculation of the carbon content will then be done using a database of peat properties from Norwegian mires, that contain values for **bulk density** and **fraction organic matter** representing the chosen peatland type, and a set value of 0.5 for **fraction of carbon content in organic matter** (see paper for references).
-
-- 2) `Custom values`: This option requires that the user knows the values of **bulk density** (in g/cm3 or tonne/m3, commonly less than 0.2 for peatlands), **fraction organic matter** (values of 0-1) and **fraction carbon content** (values of 0-1) in the given area, or that the user is interested in testing with specific values. The input values are specified in the three boxes. Once the values are inserted, the user can click on `Load values`.
-
-The total carbon content (kg) of the area will be displayed on the top right panel of this application.
-
-### Download the data
-
-Once the peat volum map is computed, it is possible to download the output maps. The results from the carbon calculation will also be available by completing the next step in the calculator.
-In the application, the user can click on `Download results` and `Download`. This will return a `.zip` file containing:
-
-- `map_descriptive.png` : a map of the given area including peat depth measurement points.
-- `map_interpolation.png` : a map with interpolated values of peat depths.
-- `interpolation_raster.tif` : a raster of the result from the interpolation of volume - ready to use in either **QGIS or ArcGIS!**
-- `results.csv` : a csv-file with results from the volume and carbon calculations. 
-
----
-
-### Author / Forfatter
+### Author
 
 The application has been created by [Benjamin Cretois](https://www.nina.no/english/Contact/Employees/Employee-info?AnsattID=15849), [Marte Fandrem](https://www.ntnu.no/ansatte/marte.fandrem) and [Magni Olsen Kyrkjeeide](https://www.nina.no/Kontakt/Ansatte/Ansattinformasjon.aspx?AnsattID=12110). This project was funded by Norwegian Research Council under Grant number 282327 and Statnett.
 
-<img src="man/figures/logo_nina.png" alt="drawing" width="100"/>
-<img src="man/figures/ntnu.png" alt="drawing" width="100"/>
-<img src="man/figures/statnett.png" alt="drawing" width="100"/>
+<img src="../man/figures/logo_nina.png" alt="drawing" width="100"/>
+<img src="../man/figures/ntnu.png" alt="drawing" width="100"/>
+<img src="../man/figures/statnett.png" alt="drawing" width="100"/>
 
 
 ### How to cite us:
