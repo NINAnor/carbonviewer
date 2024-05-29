@@ -1,0 +1,15 @@
+services:
+  shiny:
+    image: carbonviewer
+    build: .
+    ports:
+      - 8787:8787
+      - 8999:8999
+    volumes:
+      - ${HOME}/Downloads:/home/willeke.acampo/Downloads
+      - ./app.R:/home/rstudio/app/app.R
+      - ./appScripts:/home/rstudio/app/appScripts
+      - ./docs:/home/rstudio/app/docs
+      - ./translation.json:/home/rstudio/app/translation.json
+    environment:
+      - DISABLE_AUTH=true

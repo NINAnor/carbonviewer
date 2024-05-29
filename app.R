@@ -8,6 +8,8 @@ source("/home/rstudio/app/appScripts/server.R")
 options(shiny.maxRequestSize=100*1024^2)
 options(warn = -1)
 
+options(shiny.autoreload=TRUE)
+
 app <- shinyApp(ui = ui, server = server)
 sessionInfo()
 runApp(app, host ="0.0.0.0", port = 8999, launch.browser = TRUE)

@@ -1,3 +1,4 @@
+# R
 .Rproj.user
 .Rhistory
 .RData
@@ -5,3 +6,7 @@
 data_exple/
 docker_run_rstudio.sh
 rstudio-prefs.json
+
+# ignore base session data files
+data/*
+!data/gran_dataset.csv

@@ -2,16 +2,16 @@
 
 # HEADER -----------------------------------------------------------------------------------------
 header <- shinydashboard::dashboardHeader(title = "CarbonViewer",
-                          tags$li(
-                            a(
-                              strong(i18n$t("ABOUT")),
-                              height = 40,
-                              href = "https://github.com/NINAnor/carbonviewer",
-                              title = "",
-                              target = "_blank"
-                            ),
-                            class = "dropdown"
-                          )
+  tags$li(
+    a(
+      strong(i18n$t("ABOUT")),
+      height = 40,
+      href = "https://github.com/NINAnor/carbonviewer",
+      title = "",
+      target = "_blank"
+    ),
+    class = "dropdown"
+  )
 )
 
 # SIDEBAR -----------------------------------------------------------------------------------------
@@ -26,17 +26,22 @@ sidebar <- shinydashboard::dashboardSidebar(
     
     menuItem(i18n$t("Bruksanvisning"), tabName = "instruction", icon = icon("comment")),
     
-    menuItem(i18n$t("Volumberegning"), tabName = "upload", icon = icon('download'),
+    menuItem(i18n$t("Last opp data"), tabName = "upload", icon = icon('download'),
                 fileInput(inputId = "upload_zip",
                            label = i18n$t(shiny::HTML("Last opp en zip-fil")),
-                          accept = ".zip"),
-                actionButton(inputId = "test", label = i18n$t("Prøv app med testdatasett")),
-                actionButton(inputId = "unzip", label = i18n$t("Last inn datasett")),
+                          accept = ".zip")
+             ),
+
+    menuItem(i18n$t("Volumberegning"), tabName = "calculation", icon = icon('cog'),
+                actionButton(inputId = "unzip", label = i18n$t("Beregn")),
+                actionButton(inputId = "test", label = i18n$t("Beregn med testdata")),
                 actionButton(inputId = "reset", label = i18n$t("Nullstille"))
              ),
     
-    menuItem(i18n$t("Torvegenskaper"), tabName = "carbonchar", icon = icon('keyboard'),
-             
+    menuItem(i18n$t("Beregn karboninnhold"), tabName = "carbonchar", icon = icon('keyboard'),
+
+      tags$b(i18n$t("Torvegenskaper")),   
+ 
       menuItem(i18n$t("Standardverdier"), tabName = "df_values", icon = icon('keyboard'),
              selectInput(inputId = "g_peatland_type", 
                          label = i18n$t(shiny::HTML("Hovedmyrtype")),
@@ -72,10 +77,10 @@ sidebar <- shinydashboard::dashboardSidebar(
             )
     ),
     
-    menuItem(i18n$t("Valg av power"), tabName = "powersetting", icon = icon('hand-fist')
+    menuItem(i18n$t("Kart og Resultater"), tabName = "tables", icon = icon("th")
              ),
     
-    menuItem(i18n$t("Resultater"), tabName = "tables", icon = icon("th")
+    menuItem(i18n$t("Power evalueringsgrafer"), tabName = "powersetting", icon = icon('hand-fist')
              ),
     
     menuItem(i18n$t("Last ned resultater"), tabName = "download", icon = icon("file-export"),
@@ -99,7 +104,7 @@ body <- shinydashboard::dashboardBody(
     tabItem(
       tabName = "instruction",
       fluidRow(
-        box(includeMarkdown("/home/rstudio/app/instructions.md"), width = 10)
+        box(uiOutput("instructions"), width = 10)
       )
     ),
     
@@ -119,7 +124,7 @@ body <- shinydashboard::dashboardBody(
     tabItem(tabName = "powersetting",
             fluidRow(
               box(plotOutput("maeVSpower"), width = 6),
-              box(plotOutput("volumeVSpower"), width = 6)
+              box(plotOutput("volumeVSpower"), width = 6),
             ))
   )
 )
