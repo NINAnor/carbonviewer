@@ -482,7 +482,7 @@ server <- function(input, output, session){
   
   # Write the interpolation map
   shot_interp_map <- reactive({
-    b1_peat_depth <- stars::st_as_stars(df_reactive$interpolation_raster[[1]])
+    b1_peat_depth <- stars::st_as_stars(df_reactive$interpolation_raster)
     st_crs(b1_peat_depth) <- 25833
     print(b1_peat_depth)
     interp_map <- tm_shape(b1_peat_depth) +
